@@ -12,14 +12,13 @@ import { HttpClientModule } from "@angular/common/http";
 import { ContentManagerModule, SxcRootModule } from '@2sic.com/sxc-angular';
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { TitleComponent } from "./layout/title.component";
-import { NavigationComponent } from "./layout/navigation.component";
+
+
 
 @NgModule({
   declarations: [
     AppComponent,
-    TitleComponent,
-    NavigationComponent,
+
   ],
   imports: [
     BrowserModule,        // this tells Angular to run in a browser

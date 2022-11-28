@@ -1,5 +1,46 @@
-<app-title></app-title>
-<hr>
-<app-navigation></app-navigation>
-<hr>
-<router-outlet></router-outlet>
+<div class="container">
+  <div class="row">
+
+    <div class="col-12">
+      <!-- Header -->
+      <h1>Let's auto-install some popular apps (live)</h1>
+      <p>Don't worry: if you don't like one, you can remove it later without side-effects :)
+        Our best pick for you is: Auto install apps for 2sxc 12.05</p>
+      <button type="button" class="btn btn-primary">Install recommended 23 apps</button>
+      <p>In case you're wondering, we'll install the following apps:</p>
+    </div>
+
+    <!-- Alle Apps -->
+    <div *ngFor="let app of apps" class="col-md-2 app-card mb-3">
+      <!-- Source -->
+      <div class="card h-100">
+        <div class="row g-0">
+          <div class="col-md-4">
+            <img src="https://2sxc.org/{{app.icon}}?w=100" class="img-fluid rounded-start align-items-center" alt="...">
+          </div>
+          <div class="col-md-8">
+            <div class="card-body">
+              <h5 class="card-title"><a href="{{app.downloadUrl}}">{{app.displayName}}</a></h5>
+              <p class="card-text"><a href="{{app.github}}">(package {{app.version}})</a></p>
+              <!-- <p class="card-text"><small class="text-muted">{{app.shortDescription}}</small></p> -->
+
+              <input class="checkbox-item" type="checkbox">
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+
+    <div class="col-md-12">
+      <a href="#">Unselect All</a>
+      |
+      <a href="#">Select All</a>
+    </div>
+
+    <p>This dialog will disappear when you've added or created your first app. It will appear again on every new portal,
+      as the apps are per portal. If you want to add more apps later on, just get them from the <a href="#">app
+        catalog</a></p>
+  </div>
+</div>

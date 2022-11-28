@@ -13,13 +13,24 @@
 
 import { Component, ElementRef } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
+import { APPS } from "./mock-up"
+import { Apps } from './app-interface';
 
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html'
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent extends SxcAppComponent {
   constructor(el: ElementRef, context: Context) {
     super(el, context);
   }
+
+  apps : Apps[] = APPS;
+
+  ngOnInit(): void {
+    // console.log(this.app = thiAPPS['Apps'])
+    console.log(this.apps);
+  }
+
 }

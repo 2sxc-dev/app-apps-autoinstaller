@@ -1,0 +1,32 @@
+
+// .app-card{
+//   display: block;
+//     width: 240px;
+//     cursor: pointer;
+//     float: left;
+//     padding: 8px;
+//     position: relative;
+//     background: rgba(0, 0, 0, .02);
+//     &:hover{
+// box-shadow: ;
+//     }
+// }
+
+img {
+    margin: 0px 16px 0px 0px;
+    border-radius: 16px 0 16px 0;
+    width: 50px;
+    height: 50px;
+
+}
+
+.card-title{
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.checkbox-item{
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+}
