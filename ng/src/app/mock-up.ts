@@ -8,7 +8,7 @@ export const APPS: Apps[] = [
     "version": "04.03.01",
     "gitHub": "https://github.com/2sic/app-accordion",
     "urlKey": "accordion-v4-hybrid-for-dnn-and-oqtane",
-    "shortDescription": "This accordion shows headers which slide to reveal more content. Fully configurable, CSS optimized for bootstrap 4."
+    "shortDescription": "This accordion shows headers which slide to reveal more content. Fully configurable, CSS optimized for bootstrap 4.",
 },
 {
   "downloadUrl": "https://github.com/2sic/app-blog/releases/download/05.03.01/2sxcApp_Blog_5.3.1.zip",

@@ -6,4 +6,5 @@ export interface Apps {
   gitHub: string;
   urlKey: string;
   shortDescription: string;
+  isSelected?: boolean;
 }
