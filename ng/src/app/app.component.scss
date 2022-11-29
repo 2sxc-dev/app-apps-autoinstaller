@@ -9,29 +9,27 @@
     white-space: nowrap;
     width: 100%;
   }
-
   .card-text {
     margin: 0;
   }
-
   .checkbox-item {
     position: absolute !important;
     bottom: 8px !important;
     right: 8px !important;
   }
-
-
 }
+
 
 mat-icon{
   cursor: pointer;
   font-size: 30px;
 }
 
+
+// zum den Header und footer ausblenden
 ::ng-deep #to-shine-page-navigation {
   display: none !important;
 }
-
 ::ng-deep #to-shine-page-footer{
 display: none !important;
 }

@@ -5,20 +5,21 @@
       <h2>Let's auto-install some popular apps (live)</h2>
       <p class="mb-3">Don't worry: if you don't like one, you can remove it later without side-effects :)
         Our best pick for you is: Auto install apps for 2sxc 12.05</p>
+        <!-- Download Button -->
       <button type="button" class="btn btn-primary mb-3" (click)="installApps()">
         <span>Install selected {{(selectedApps | async).length}} apps</span>
        </button>
       <p>In case you're wondering, we'll install the following apps:</p>
     </div>
   </div>
-
+<!-- toogle view -->
   <div class="d-flex justify-content-end mb-3 ">
     <mat-icon (click)="toggleView()" class="me-3">grid_on</mat-icon>
     <mat-icon (click)="toggleView()" class="me-3">list</mat-icon>
   </div>
-
   <div class="row mb-2">
     <!-- Alle Apps -->
+    <!-- ngClass für tile und list ansicht true gilt für beide -->
     <div *ngFor="let app of apps$ | async" [ngClass]="{'col-md-4 col-lg-3': isTilesView, 'col-12': !isTilesView, 'app-card mb-3': true}" >
       <!-- Source -->
       <div class="card h-100 bg-light ">
@@ -40,14 +41,13 @@
       </div>
     </div>
   </div>
-
+<!-- button select or unselect -->
   <div class="row">
     <div class="col-md-12 mb-3">
       <button type="button" class="btn btn-secondary" (click)="toggleSelection(false)">Unselect All</button>
       |
       <button type="button" class="btn btn-secondary" (click)="toggleSelection(true)">Select All</button>
     </div>
-
     <p>This dialog will disappear when you've added or created your first app. It will appear again on every new portal,
       as the apps are per portal. If you want to add more apps later on, just get them from the <a href="https://2sxc.org/apps" target="_blank">app
         catalog</a></p>
