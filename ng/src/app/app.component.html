@@ -5,44 +5,48 @@
       <h2>Let's auto-install some popular apps (live)</h2>
       <p class="mb-3">Don't worry: if you don't like one, you can remove it later without side-effects :)
         Our best pick for you is: Auto install apps for 2sxc 12.05</p>
-      <button type="button" class="btn btn-primary mb-3" (click)="installApps()">Install recommended 23 apps</button>
+      <button type="button" class="btn btn-primary mb-3" (click)="installApps()">
+        <span *ngIf="selectedAppLength == 23" >Install recommende {{selectedAppLength}} apps </span>
+        <span *ngIf="selectedAppLength < 23" > Install selected {{selectedAppLength}} apps</span>
+       </button>
       <p>In case you're wondering, we'll install the following apps:</p>
     </div>
   </div>
 
-  <div>
-
-
+  <div class="d-flex justify-content-end mb-3 ">
+    <mat-icon (click)="toggleView()" class="me-3">grid_on</mat-icon>
+    <mat-icon (click)="toggleView()" class="me-3">list</mat-icon>
   </div>
 
   <div class="row mb-2">
     <!-- Alle Apps -->
-    <div *ngFor="let app of apps$ | async" class="col-md-4 col-lg-3 app-card mb-3">
+    <div *ngFor="let app of apps$ | async" [ngClass]="{'col-md-4 col-lg-3': isTilesView, 'col-12': !isTilesView, 'app-card mb-3': true}" >
       <!-- Source -->
       <div class="card h-100 bg-light ">
         <div class="row h-100 g-0">
-          <div class="col-md-4 d-flex align-items-center">
-            <img src="https://2sxc.org/{{app.icon}}?w=100" class="img-fluid rounded-start align-items-center" alt="...">
+          <div [ngClass]="{'col-md-4': isTilesView, 'col-2': !isTilesView, 'd-flex align-items-center': true}" >
+            <img src="https://2sxc.org/{{app.icon}}?w=400" class="img-fluid rounded-start align-items-center wh-c" alt="...">
           </div>
           <div class="col-md-8">
-            <div class="card-body p-1 py-2 h-100">
-              <h5 class="card-title mb-1"><a href="{{app.downloadUrl}}">{{app.displayName}}</a></h5>
-              <p class="card-text"><a href="{{app.gitHub}}" target="_blank">(package {{app.version}})</a></p>
-              <!-- description -->
-              <!-- <p class="card-text"><small class="text-muted">{{app.shortDescription}}</small></p> -->
-              <input class="checkbox-item" type="checkbox" (click)="changeValue(app, app.urlKey)" [(ngModel)]="app.isSelected">
+            <div class="card-body h-100">
+              <h5 [ngClass]="{'fs-6': isTilesView, 'fs-5': !isTilesView, 'card-title mb-1': true}"><a href="{{app.downloadUrl}}">{{app.displayName}}</a></h5>
+              <div class="card-text">
+                <small><a href="{{app.gitHub}}" target="_blank">(package {{app.version}})</a></small>
+                <p [ngClass]="{'d-none': isTilesView, 'd-flex': !isTilesView, 'mt-4': true}" >{{app.shortDescription}}</p>
+                <input class="checkbox-item" type="checkbox" (click)="changeValue(app, app.urlKey)" [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
+              </div>
             </div>
           </div>
         </div>
       </div>
-
     </div>
   </div>
+
   <div class="row">
     <div class="col-md-12 mb-3">
-      <button type="button" class="btn btn-secondary" (click)="selectAll(false)">Unselect All</button>
+      <button type="button" class="btn btn-secondary" (click)="toggleSelection(false)">Unselect All</button>
       |
-      <button type="button" class="btn btn-secondary" (click)="selectAll(true)">Select All</button>
+      <button type="button" class="btn btn-secondary" (click)="toggleSelection(true)">Select All</button>
     </div>
 
     <p>This dialog will disappear when you've added or created your first app. It will appear again on every new portal,

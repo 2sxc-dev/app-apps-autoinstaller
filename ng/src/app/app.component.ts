@@ -16,7 +16,8 @@ export class AppComponent extends SxcAppComponent {
 
   apps$!: Observable<Apps[]>;
   selectedApps : Apps[] = [];
-  // selectedAppLength : string = "";
+  selectedAppLength : number = 23;
+  isTilesView: boolean = true;
 
   private allSelected!: BehaviorSubject<boolean>;
 
@@ -35,7 +36,6 @@ export class AppComponent extends SxcAppComponent {
           }
         });
 
-        // this.selectedAppLength = this.selectedApps.length.toLocaleString();
 
         return apps;
       }),
@@ -56,19 +56,20 @@ export class AppComponent extends SxcAppComponent {
       this.selectedApps.splice(indexOfApps, 1);
     }
 
-    // this.selectedAppLength = this.selectedApps.length.toLocaleString();
-  }
-
-  selectAll(val: boolean) {
-    this.allSelected.next(val);
+    this.selectedAppLength = this.selectedApps.length;
   }
 
   installApps() {
-
-
-console.log( this.selectedApps)
+    console.log( this.selectedApps)
   }
 
+  toggleSelection(val: boolean) {
+    this.allSelected.next(val);
+  }
+
+  toggleView() {
+    this.isTilesView = !this.isTilesView;
+  }
 
 }
 

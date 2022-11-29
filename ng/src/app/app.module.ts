@@ -5,6 +5,8 @@ import { ContentManagerModule, SxcRootModule } from '@2sic.com/sxc-angular';
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { FormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {MatIconModule} from '@angular/material/icon';
 
 
 
@@ -21,6 +23,8 @@ import { FormsModule } from '@angular/forms';
     SxcRootModule,
     ContentManagerModule,
     FormsModule,
+    BrowserAnimationsModule,
+    MatIconModule
   ],
   providers: [],
   bootstrap: [AppComponent],

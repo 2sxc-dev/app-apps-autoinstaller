@@ -1,8 +1,6 @@
 .app-card {
   img {
     border-radius: 16px 0 16px 0;
-    width: 80px;
-    height: 80px;
   }
   .card-title {
     overflow: hidden;
@@ -10,11 +8,9 @@
     display: inline-block;
     white-space: nowrap;
     width: 100%;
-    font-size: 14px;
   }
 
-  .card-text{
-    font-size: 12px;
+  .card-text {
     margin: 0;
   }
 
@@ -23,6 +19,13 @@
     bottom: 8px !important;
     right: 8px !important;
   }
+
+
+}
+
+mat-icon{
+  cursor: pointer;
+  font-size: 30px;
 }
 
 ::ng-deep #to-shine-page-navigation {
