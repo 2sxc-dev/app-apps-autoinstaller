@@ -2,7 +2,7 @@ import { Component, ElementRef } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
 import { APPS } from "./mock-up"
 import { Apps } from './app-interface';
-import { BehaviorSubject, combineLatest, filter, map, Observable, of, share, shareReplay, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, delay, map, Observable, of, tap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -15,56 +15,62 @@ export class AppComponent extends SxcAppComponent {
   }
 
   apps$!: Observable<Apps[]>;
-  selectedApps : Apps[] = [];
-  selectedAppLength : number = 23;
+  selectedApps!: BehaviorSubject<Apps[]>;
+
+  selectedAppsArr : Apps[] = [];
+
   isTilesView: boolean = true;
 
-  private allSelected!: BehaviorSubject<boolean>;
+  private isAllSelected!: BehaviorSubject<boolean>;
 
   ngOnInit(): void {
-    this.allSelected = new BehaviorSubject(true);
+    this.isAllSelected = new BehaviorSubject(true);
+    this.selectedApps = new BehaviorSubject([]);
 
-    this.apps$ = combineLatest(of(APPS), this.allSelected).pipe(
+    this.apps$ = combineLatest(of(APPS), this.isAllSelected).pipe(
       map(([apps, allSelected]) => {
-        this.selectedApps = [];
+        this.selectedAppsArr = [];
 
         apps.forEach(app => {
           app.isSelected = allSelected;
 
           if(app.isSelected) {
-            this.selectedApps.push(app)
+            this.selectedAppsArr.push(app)
           }
         });
 
-
         return apps;
       }),
-      tap(() => console.log('trigger'))
+      delay(0),
+      tap(() => {
+        this.selectedApps.next(this.selectedAppsArr);
+      })
     )
   }
 
   changeValue(app: Apps, urlKey: string) {
-    const found = this.selectedApps.some((app : Apps) => app.urlKey == urlKey);
+    const found = this.selectedAppsArr.some((app : Apps) => app.urlKey == urlKey);
 
     if (!found) {
-      this.selectedApps.push(app)
+      this.selectedAppsArr.push(app)
     } else {
-      const indexOfApps = this.selectedApps.findIndex((app: Apps) => {
+      const indexOfApps = this.selectedAppsArr.findIndex((app: Apps) => {
         return app.urlKey === urlKey;
       });
 
-      this.selectedApps.splice(indexOfApps, 1);
+      this.selectedAppsArr.splice(indexOfApps, 1);
     }
 
-    this.selectedAppLength = this.selectedApps.length;
+    this.selectedApps.next(this.selectedAppsArr)
   }
 
   installApps() {
-    console.log( this.selectedApps)
+    var message = { 'action': 'install', 'moduleId': 'window.ModuleId', 'packages': this.selectedAppsArr};
+    window.parent.postMessage(JSON.stringify(message), '*');
   }
 
   toggleSelection(val: boolean) {
-    this.allSelected.next(val);
+    this.isAllSelected.next(val);
   }
 
   toggleView() {

@@ -6,8 +6,7 @@
       <p class="mb-3">Don't worry: if you don't like one, you can remove it later without side-effects :)
         Our best pick for you is: Auto install apps for 2sxc 12.05</p>
       <button type="button" class="btn btn-primary mb-3" (click)="installApps()">
-        <span *ngIf="selectedAppLength == 23" >Install recommende {{selectedAppLength}} apps </span>
-        <span *ngIf="selectedAppLength < 23" > Install selected {{selectedAppLength}} apps</span>
+        <span>Install selected {{(selectedApps | async).length}} apps</span>
        </button>
       <p>In case you're wondering, we'll install the following apps:</p>
     </div>
