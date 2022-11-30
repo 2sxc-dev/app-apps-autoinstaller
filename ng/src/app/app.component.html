@@ -23,8 +23,8 @@
     <div *ngFor="let app of apps$ | async" [ngClass]="{'col-md-4 col-lg-3': isTilesView, 'col-12': !isTilesView, 'app-card mb-3': true}" >
       <!-- Source -->
       <div class="card h-100 bg-light ">
-        <div class="row h-100 g-0">
-          <div [ngClass]="{'col-md-4': isTilesView, 'col-2': !isTilesView, 'd-flex align-items-center': true}" >
+        <div class="row h-100 g-0 no-gutters">
+          <div [ngClass]="{'col-md-4': isTilesView, 'col-2': !isTilesView, 'd-flex align-items-center ': true}" >
             <img src="https://2sxc.org/{{app.icon}}?w=400" class="img-fluid rounded-start align-items-center wh-c" alt="...">
           </div>
           <div class="col-md-8">

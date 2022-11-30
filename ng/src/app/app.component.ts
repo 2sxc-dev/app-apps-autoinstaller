@@ -1,8 +1,8 @@
 import { Component, ElementRef } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
-import { APPS } from "./mock-up"
+import { BehaviorSubject, combineLatestWith, delay, map, Observable, tap } from 'rxjs';
 import { Apps } from './app-interface';
-import { BehaviorSubject, combineLatest, delay, map, Observable, of, tap } from 'rxjs';
+import { DataService } from './services/data.service';
 
 @Component({
   selector: 'app-root',
@@ -10,7 +10,7 @@ import { BehaviorSubject, combineLatest, delay, map, Observable, of, tap } from 
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent extends SxcAppComponent {
-  constructor(el: ElementRef, context: Context) {
+  constructor(el: ElementRef, context: Context, private dataService: DataService) {
     super(el, context);
   }
 
@@ -27,7 +27,30 @@ export class AppComponent extends SxcAppComponent {
     this.isAllSelected = new BehaviorSubject(true); // zuerst sind alle checkboxen ausgewählt und true
     this.selectedApps = new BehaviorSubject([]); //hier werden die ausgewählten elemente hinzugefügt
 
-    this.apps$ = combineLatest(of(APPS), this.isAllSelected).pipe( // abhänigkeit von apps$ ist das Mockup APPS und die selected
+    this.dataService.getApp().pipe(
+      combineLatestWith(this.isAllSelected), // abhänigkeit von apps$ ist das Mockup APPS und die selected
+      map(([apps, allSelected]) => {
+        this.selectedAppsArr = []; // erstelle ein leeres Array
+
+        apps.forEach(app => {
+          app.isSelected = allSelected; //übergib der app den status, ob es isSelected ist oder nicht, zubeinn sind alle selected
+
+          if(app.isSelected) { // wenn app selectet ist
+            this.selectedAppsArr.push(app) // füge die app in das Arry hinzu wenn es ausgewählt wird
+          }
+        });
+
+        apps.sort((a, b) => a.displayName.localeCompare(b.displayName)) // Sotieren von A - Z
+
+        return apps; // gib die apps mit dem neuen status in die apps$ zurück auf die wir später zugreiffen
+      }),
+      delay(0), // lösst problem von change detection
+      tap(() => {
+        this.selectedApps.next(this.selectedAppsArr); // füge das array in das behaviorsubjcet zu, so dass es verändernungen mit bekommt
+      })
+    )
+    this.apps$ = this.dataService.getApp().pipe(
+      combineLatestWith(this.isAllSelected), // abhänigkeit von apps$ ist das Mockup APPS und die selected
       map(([apps, allSelected]) => {
         this.selectedAppsArr = []; // erstelle ein leeres Array
 
