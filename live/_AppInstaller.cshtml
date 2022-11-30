@@ -1,0 +1,47 @@
+@inherits Custom.Hybrid.Razor12
+@using System.Linq;
+@using ToSic.Razor.Blade;
+@using ToSic.Sxc.Services;
+@* This inherits statement gets you features like App, CmsContext, Data etc. - you can delete this comment *@
+@{
+  // activate JS features so edit-ui can be used
+  var page = GetService<IPageService>();
+  page.Activate("2sxc.JsCore");
+
+  var recipes = AsList(Data);
+
+  // Add <base> tag using RazorBlade - Angular needs this so that links changing dialogs (routes) work properly
+  HtmlPage.AddBase((Link.Base()));
+  // Create helper to manage the editions (live, staging etc.)
+  var editions = CreateInstance("../shared/Editions.cs");
+
+  // Create helper to integrate angular best-practice
+  var ngHelpers = CreateInstance("../shared/Angular.cs");
+}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+  href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+  rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href='@Html.Raw("https://unpkg.com/@angular/material@14.2.6/prebuilt-themes/indigo-pink.css")' rel="stylesheet">
+<link href='@Html.Raw("https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css")' rel="stylesheet" >
+<div class="mat-typography">
+  @* Show the Angular either from ng-server (local) or from the compiled live/staging folders *@
+  @if (editions.CurrentEdition == "local")
+  {
+    @Html.Partial("../_AngularApp.PartLocalAssets.cshtml")
+  }
+  else
+  {
+    @Html.Raw(ngHelpers.ImportAngularHtml(editions.CurrentEdition));
+  }
+</div>
+
+@* Show edition selector for host/super users only - you could also change this, to allow testers to see this *@
+@if (Edit.Enabled)
+{
+  @Html.Partial("../_AngularApp.PartEditions.cshtml", new { Editions = "live,staging,local" })
+}
+
