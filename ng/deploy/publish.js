@@ -17,7 +17,7 @@ del.sync(`${publishPath}/{dist/${appName}}`, { force: true })
 
 // Publishing
 console.log(`Publishing ${edition} to ${publishPath}`)
-cpx.copySync("./dist/**/*.*", `${publishPath}/dist`); // publish dist folder (ng-app)
+cpx.copySync("./dist/**/*.*", `${publishPath}/dist`); // publish dist folder (app-installer)
 console.log(`dist of ${edition} published...`);
 cpx.copySync(`../${edition}/api/**/*.*`, `${publishPath}/api`) // publish API folder
 console.log(`Api of '${edition}' published...`);

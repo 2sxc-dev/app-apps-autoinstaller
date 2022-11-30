@@ -2,6 +2,15 @@
   img {
     border-radius: 16px 0 16px 0;
   }
+
+  .card{
+    &:hover{
+      transition: all 225ms ease-in-out;
+      // box-shadow: 10px 10px 15px silver;
+      box-shadow: 2px 9px 18px 6px rgba(153, 153, 153, 0.45);
+    }
+  }
+
   .card-title {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -13,9 +22,9 @@
     margin: 0;
   }
   .checkbox-item {
-    position: absolute !important;
-    bottom: 8px !important;
-    right: 8px !important;
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
   }
 }
 

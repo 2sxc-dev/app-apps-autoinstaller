@@ -7,4 +7,8 @@ export interface Apps {
   urlKey: string;
   shortDescription: string;
   isSelected?: boolean;
+  minDnn: string;
+  min2Sxc: string;
+  minOqt: string;
+
 }

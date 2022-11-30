@@ -1,5 +1,5 @@
 {
-  "name": "ng-app",
+  "name": "app-installer",
   "version": "14.00.00",
   "config": {
     "publish_path_ex": "..",

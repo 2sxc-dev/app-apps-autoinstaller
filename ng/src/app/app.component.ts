@@ -39,6 +39,8 @@ export class AppComponent extends SxcAppComponent {
           }
         });
 
+        apps.sort((a, b) => a.displayName.localeCompare(b.displayName)) // Sotieren von A - Z
+
         return apps; // gib die apps mit dem neuen status in die apps$ zurück auf die wir später zugreiffen
       }),
       delay(0), // lösst problem von change detection
