@@ -23,18 +23,21 @@
     <div *ngFor="let app of apps$ | async" [ngClass]="{'col-md-4 col-lg-3': isTilesView, 'col-12': !isTilesView, 'app-card mb-3': true}" >
       <!-- Source -->
       <div class="card h-100 bg-light ">
-        <div class="row h-100 g-0 no-gutters">
+        <div class="row h-100 g-0 no-gutters position-relative">
           <div [ngClass]="{'col-md-4': isTilesView, 'col-2': !isTilesView, 'd-flex align-items-center ': true}" >
             <img src="https://2sxc.org/{{app.icon}}?w=400" class="img-fluid rounded-start align-items-center wh-c" alt="...">
           </div>
           <div class="col-md-8">
             <div class="card-body h-100">
-              <h5 [ngClass]="{'fs-6': isTilesView, 'fs-5': !isTilesView, 'card-title mb-1': true}"><a href="{{app.downloadUrl}}">{{app.displayName}}</a></h5>
+              <h5 [ngClass]="{'fs-6': isTilesView, 'fs-5': !isTilesView, 'card-title mb-1': true}"><a target="_blank" href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
               <div class="card-text">
                 <small><a href="{{app.gitHub}}" target="_blank">(package {{app.version}})</a></small>
                 <p [ngClass]="{'d-none': isTilesView, 'd-flex': !isTilesView, 'mt-4': true}" >{{app.shortDescription}}</p>
                 <input class="checkbox-item" type="checkbox" (click)="changeValue(app, app.urlKey)" [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
               </div>
+
+              <!-- <a href="https://2sxc.org/apps/app/{{app.urlKey}}" target="_blank" class="stretched-link">Test</a> -->
+
             </div>
           </div>
         </div>
@@ -53,3 +56,5 @@
         catalog</a></p>
   </div>
 </div>
+
+<a ></a>

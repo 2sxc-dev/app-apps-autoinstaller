@@ -1,7 +1,7 @@
 import { Component, ElementRef } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
-import { BehaviorSubject, combineLatestWith, delay, map, Observable, tap } from 'rxjs';
 import { Apps } from './app-interface';
+import { BehaviorSubject, combineLatestWith, delay, map, Observable, tap } from 'rxjs';
 import { DataService } from './services/data.service';
 
 @Component({
