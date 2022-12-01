@@ -19,7 +19,7 @@ export class AppComponent extends SxcAppComponent {
 
   selectedAppsArr: Apps[] = []; // array welches wir mit ausgewählten Apps befühlen / ist kein observable
   isTilesView: boolean = true; // view von tile zu list je nach dem andere klassen einblenden, beim start tile
-  appLenght: boolean = false;
+  searchValue: string = ''
   private isAllSelected!: BehaviorSubject<boolean>; // observable mit true oder false der selecte box auszuwählten / abzuwählen
 
   params = new URLSearchParams(window.location.search);
@@ -88,6 +88,11 @@ export class AppComponent extends SxcAppComponent {
 
   toggleView() {
     this.isTilesView = !this.isTilesView; // wenn es true ist, wird es beim klicken false und umgekehrt
+  }
+
+  search(event) {
+    this.searchValue = event;
+    console.log(this.searchValue)
   }
 
 }
