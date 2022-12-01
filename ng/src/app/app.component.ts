@@ -44,17 +44,6 @@ export class AppComponent extends SxcAppComponent {
         apps.forEach(app => {
           app.isSelected = allSelected; //übergib der app den status, ob es isSelected ist oder nicht, zubeinn sind alle selected
 
-          console.log(app.isSelected)
-
-          if (app.isSelected == true) {
-            this.appLenght = true
-          }
-          if (app.isSelected == '') {
-            this.appLenght = false
-          }
-
-          console.log(this.appLenght, 're')
-
 
           if (app.isSelected) { // wenn app selectet ist
             this.selectedAppsArr.push(app) // füge die app in das Arry hinzu wenn es ausgewählt wird

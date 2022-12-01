@@ -28,19 +28,15 @@
   }
   a {
     cursor: pointer;
+    text-decoration: none;
   }
   .version-link {
-    color: red;
     z-index: 2;
+position: relative;
   }
   .checkbox-item {
     z-index: 2;
     cursor: pointer;
-  }
-  .stretched-link {
-    z-index: -1;
-    position: relative;
-    // position wechsel
   }
 }
 
