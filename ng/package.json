@@ -3,7 +3,7 @@
   "version": "14.00.00",
   "config": {
     "publish_path_ex": "..",
-    "publish_path": "C:\\Projects\\nvquicksite\\2sxcAutoinstaller\\Website\\Portals\\0\\2sxc\\App-Installer\\"
+    "publish_path": "\\\\nasw2\\P\\2sxc 2019b\\Web\\Portals\\0\\2sxc\\App-Installer"
   },
   "scripts": {
     "ng": "ng",

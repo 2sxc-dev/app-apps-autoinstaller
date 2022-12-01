@@ -3,8 +3,8 @@
     border-radius: 16px 0 16px 0;
   }
 
-  .card{
-    &:hover{
+  .card {
+    &:hover {
       transition: all 225ms ease-in-out;
       // box-shadow: 10px 10px 15px silver;
       box-shadow: 2px 9px 18px 6px rgba(153, 153, 153, 0.45);
@@ -26,25 +26,42 @@
     bottom: 8px;
     right: 8px;
   }
-  a{
+  a {
     cursor: pointer;
+  }
+  .version-link {
+    color: red;
+    z-index: 2;
+  }
+  .checkbox-item {
+    z-index: 2;
+    cursor: pointer;
+  }
+  .stretched-link {
+    z-index: -1;
+    position: relative;
+    // position wechsel
   }
 }
 
-.posiiton-static{
+small a {
+  color: rgba(0, 0, 255, 0.5);
+  z-index: 10;
+}
+
+.posiiton-static {
   position: static !important;
 }
 
-mat-icon{
+mat-icon {
   cursor: pointer;
   font-size: 30px;
 }
-
 
 // zum den Header und footer ausblenden
 ::ng-deep #to-shine-page-navigation {
   display: none !important;
 }
-::ng-deep #to-shine-page-footer{
-display: none !important;
+::ng-deep #to-shine-page-footer {
+  display: none !important;
 }
