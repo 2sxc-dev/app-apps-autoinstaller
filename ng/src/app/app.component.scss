@@ -30,18 +30,10 @@
 .app-view-list {
   padding-bottom: 10px;
   border-bottom: 1px solid rgba(177, 177, 177, 0.45);
-  .checkbox-item-list {
-    position: absolute;
-    left: 18px;
-    top: 50%;
-    z-index: 2;
-    transform: translateY(-100%);
-  }
 }
 
 //allgemeine classes
 a {
-  cursor: pointer;
   text-decoration: none;
 }
 
@@ -62,20 +54,12 @@ small a {
   z-index: 10;
 }
 
-.input-search {
-  float: right;
-  padding: 6px;
-  border: none;
-  margin-top: 8px;
-  margin-right: 16px;
-  font-size: 17px;
-  border: 1px solid blue;
-  border-radius: 5px;
+.form-control {
+  max-width: 250px;
 }
 
 mat-icon {
   cursor: pointer;
-  font-size: 30px;
 }
 //
 
@@ -83,6 +67,7 @@ mat-icon {
 ::ng-deep #to-shine-page-navigation {
   display: none !important;
 }
+
 ::ng-deep #to-shine-page-footer {
   display: none !important;
 }

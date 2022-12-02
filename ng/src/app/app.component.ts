@@ -13,14 +13,15 @@ export class AppComponent extends SxcAppComponent {
   constructor(el: ElementRef, context: Context, private dataService: DataService) {
     super(el, context);
   }
+  private isAllSelected!: BehaviorSubject<boolean>; // observable mit true oder false der selecte box auszuwählten / abzuwählen
 
   apps$!: Observable<Apps[]>; //alle apps als observable, greifen hier im html mit async darauf zurück
   selectedApps!: BehaviorSubject<Apps[]>; //hilfe observable anzahl in html anzuzeigen
 
   selectedAppsArr: Apps[] = []; // array welches wir mit ausgewählten Apps befühlen / ist kein observable
   isTilesView: boolean = true; // view von tile zu list je nach dem andere klassen einblenden, beim start tile
-  searchValue: string = ''
-  private isAllSelected!: BehaviorSubject<boolean>; // observable mit true oder false der selecte box auszuwählten / abzuwählen
+
+  searchText :string = '';
 
   params = new URLSearchParams(window.location.search);
   sxcVersion = this.params.get("sxcversion");
@@ -30,7 +31,6 @@ export class AppComponent extends SxcAppComponent {
   hasUrlParams = true;
 
   ngOnInit(): void {
-
     this.hasUrlParams = this.params.has("sysversion") && this.params.has("sxcversion") && this.params.has("SexyContentVersion");
 
     this.isAllSelected = new BehaviorSubject(true); // zuerst sind alle checkboxen ausgewählt und true
@@ -89,12 +89,6 @@ export class AppComponent extends SxcAppComponent {
   toggleView(mode: string) {
     this.isTilesView = mode == "tiles" ? true : false; // wenn es true ist, wird es beim klicken false und umgekehrt
   }
-
-  search(event) {
-    this.searchValue = event;
-    console.log(this.searchValue)
-  }
-
 }
 
 

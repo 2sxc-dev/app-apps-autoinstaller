@@ -6,13 +6,15 @@ import { AppComponent } from "./app.component";
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatIconModule} from '@angular/material/icon';
+import { SearchPipe } from './search.pipe';
+
 
 
 @NgModule({
   declarations: [
     AppComponent,
-
-  ],
+      SearchPipe
+   ],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -20,7 +22,7 @@ import {MatIconModule} from '@angular/material/icon';
     ContentManagerModule,
     FormsModule,
     BrowserAnimationsModule,
-    MatIconModule
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
