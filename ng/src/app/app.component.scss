@@ -1,23 +1,10 @@
-.app-card {
-  img {
-    border-radius: 16px 0 16px 0;
-  }
-
+// app-view-tiles classen
+.app-view-tiles {
   .card-grid {
-    background-color: #f1f1ee !important;
     &:hover {
       transition: all 225ms ease-in-out;
-      // box-shadow: 10px 10px 15px silver;
       box-shadow: 2px 9px 18px 6px rgba(153, 153, 153, 0.45);
     }
-  }
-
-  .card-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-block;
-    white-space: nowrap;
-    width: 100%;
   }
   .card-text {
     margin: 0;
@@ -27,18 +14,47 @@
     bottom: 8px;
     right: 8px;
   }
-  a {
-    cursor: pointer;
-    text-decoration: none;
-  }
+
   .version-link {
     z-index: 2;
     position: relative;
   }
+
   .checkbox-item {
     z-index: 2;
     cursor: pointer;
   }
+}
+
+// app-view-list classen
+.app-view-list {
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(177, 177, 177, 0.45);
+  .checkbox-item-list {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    z-index: 2;
+    transform: translateY(-100%);
+  }
+}
+
+//allgemeine classes
+a {
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.card-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  white-space: nowrap;
+  width: 100%;
+}
+
+img {
+  border-radius: 16px 0 16px 0;
 }
 
 small a {
@@ -46,11 +62,7 @@ small a {
   z-index: 10;
 }
 
-.posiiton-static {
-  position: static !important;
-}
-
-input {
+.input-search {
   float: right;
   padding: 6px;
   border: none;
@@ -61,32 +73,11 @@ input {
   border-radius: 5px;
 }
 
-.imgDiv {
-  width: 60px;
-  margin-left: 50px;
-}
-
-.card-list {
-  background-color: transparent;
-  border: none;
-}
-
-.checkbox-item-list {
-  position: absolute;
-  left: 18px;
-  top: 50%;
-  z-index: 2;
-  transform: translateY(-100%);
-}
-
-.bg-light {
-  background-color: transparent !important;
-}
-
 mat-icon {
   cursor: pointer;
   font-size: 30px;
 }
+//
 
 // zum den Header und footer ausblenden
 ::ng-deep #to-shine-page-navigation {

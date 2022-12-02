@@ -86,8 +86,8 @@ export class AppComponent extends SxcAppComponent {
     this.isAllSelected.next(val); // der wert true oder false (val von html) wird an den observable übergeben, jenach dem werden sie alle checked / unchecked
   }
 
-  toggleView() {
-    this.isTilesView = !this.isTilesView; // wenn es true ist, wird es beim klicken false und umgekehrt
+  toggleView(mode: string) {
+    this.isTilesView = mode == "tiles" ? true : false; // wenn es true ist, wird es beim klicken false und umgekehrt
   }
 
   search(event) {

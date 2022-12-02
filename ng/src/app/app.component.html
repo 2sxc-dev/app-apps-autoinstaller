@@ -2,7 +2,7 @@
   ERROR: Check URL parameters
 </div>
 
-<div *ngIf="hasUrlParams" class="container">
+<div *ngIf="hasUrlParams" class="container-fluid">
 
   <div class="row mb-2">
     <div class="col-12 mt-3">
@@ -17,14 +17,14 @@
       </button>
       <p>In case you're wondering, we'll install the following apps:</p>
     </div>
-<div class=" d-flex justify-content-start mb-2 col-md-3" >
-    <input (ngModelChange)="search($event)" [ngModel]="searchValue" type="search" placeholder="Search..">
+    <div class=" d-flex justify-content-start mb-2 col-md-3">
+      <input class="input-search" (ngModelChange)="search($event)" [ngModel]="searchValue" type="search"
+        placeholder="Search..">
     </div>
   </div>
 
-
   <!-- toogle view -->
-  <div class="d-flex justify-content-between mb-3 ">
+  <div class="d-flex justify-content-between mb-2">
 
     <div class="mb-3">
       <button type="button" class="btn btn-secondary me-2" (click)="toggleSelection(false)">Unselect All</button>
@@ -32,8 +32,8 @@
       <button type="button" class="btn btn-secondary ms-2" (click)="toggleSelection(true)">Select All</button>
     </div>
     <div>
-      <mat-icon *ngIf="!isTilesView"  (click)="toggleView()" class="me-3">grid_on</mat-icon>
-      <mat-icon *ngIf="isTilesView" (click)="toggleView()" class="me-3">list</mat-icon>
+      <mat-icon (click)="toggleView('tiles')" class="me-3">grid_on</mat-icon>
+      <mat-icon (click)="toggleView('list')" class="me-3">list</mat-icon>
     </div>
   </div>
 
@@ -42,40 +42,55 @@
     There is no app for this version
   </div>
 
-  <div class="row mb-2 ">
-    <!-- Alle Apps -->
-    <!-- ngClass für tile und list ansicht true gilt für beide -->
-    <div *ngFor="let app of apps$ | async"
-      [ngClass]="{'col-md-4 col-lg-3': isTilesView, 'col-12': !isTilesView, 'app-card mb-3 ': true}">
-      <!-- Source -->
-      <div  [ngClass]="{'h-100 card-grid': isTilesView, ' card-list': !isTilesView, 'card bg-light': true}" >
-        <div [ngClass]="{'row': isTilesView, ' d-flex align-items-center': !isTilesView, 'position-relative': true}">
-          <div [ngClass]="{'col-md-4': isTilesView, 'col-2 imgDiv': !isTilesView, 'd-flex align-items-center ': true}">
-            <img src="https://2sxc.org/{{app.icon}}?w=400" class="img-fluid rounded-start align-items-center wh-c"
-              alt="...">
-          </div>
-          <div class="col-md-8 tt">
-            <div [ngClass]="{'': isTilesView, 'p-1 ps-3': !isTilesView, 'card-body h-100 ': true}"         >
-              <h5 [ngClass]="{'fs-6': isTilesView, 'fs-5': !isTilesView, 'card-title mb-1': true}"><a target="_blank"
-                  href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
-              <div class="card-text">
-                <small><a class="version-link" href="{{app.gitHub}}" target="_blank">(package
-                    {{app.version}})</a></small>
-                <!-- <p [ngClass]="{'d-none': isTilesView, 'd-flex': !isTilesView, 'mt-4': true}">{{app.shortDescription}}
-                </p> -->
-                <input [ngClass]="{'checkbox-item': isTilesView, 'checkbox-item-list': !isTilesView}" type="checkbox" (click)="changeValue(app, app.urlKey)"
-                  [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
+  <!-- Alle Apps -->
+  <ng-container *ngIf="apps$ | async as apps">
+    <!-- Tiles view -->
+    <div *ngIf="isTilesView" class="row mb-2">
+      <div *ngFor="let app of apps" class="col-12 col-sm-6 col-md-6 col-lg-4 col-xxl-2 mb-3 app-view-tiles">
+        <div class="h-100 card-grid card bg-light">
+          <div class="row g-0 position-relative">
+            <div class="col-md-4 d-flex align-items-center">
+              <img src="https://2sxc.org/{{app.icon}}?w=800" class="img-fluid rounded-start align-items-center"
+                alt="...">
+            </div>
+            <div class="col-md-8">
+              <div class="card-body px-xxl-3 py-3 py-md-0 h-100 d-flex flex-column justify-content-center">
+                <h5 class="fs-6 card-title mb-1"><a target="_blank"
+                    href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
+                <div class="card-text">
+                  <small><a class="version-link" href="{{app.gitHub}}" target="_blank">({{app.version}})</a></small>
+                  <!-- <p class= "d-none': isTilesView, 'd-flex': !isTilesView, 'mt-4': true}">{{app.shortDescription}}
+                      </p> -->
+                  <input class="checkbox-item" type="checkbox" (click)="changeValue(app, app.urlKey)"
+                    [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
+                </div>
+                <a href="https://2sxc.org/apps/app/{{app.urlKey}}" target="_blank" class="stretched-link"></a>
               </div>
-              <a href="https://2sxc.org/apps/app/{{app.urlKey}}" target="_blank" class="stretched-link"></a>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <!-- button select or unselect -->
-  <div class="row">
 
+    <!-- List view -->
+    <div *ngIf="!isTilesView">
+      <div *ngFor="let app of apps" class="d-flex align-items-center mb-2 app-view-list ">
+        <input class="me-3" type="checkbox" (click)="changeValue(app, app.urlKey)" [(ngModel)]="app.isSelected"
+          [(value)]="app.urlKey">
+        <div class="d-flex align-items-center">
+          <img src="https://2sxc.org/{{app.icon}}?w=50" class="img-fluid rounded-start align-items-center" alt="...">
+        </div>
+        <div class="ms-3 ">
+          <h5 class="fs-6 mb-0 card-title"><a target="_blank"
+              href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
+          <small><a class="version-link" href="{{app.gitHub}}" target="_blank">(package
+              {{app.version}})</a></small>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="row">
     <p>This dialog will disappear when you've added or created your first app. It will appear again on every new portal,
       as the apps are per portal. If you want to add more apps later on, just get them from the <a
         href="https://2sxc.org/apps" target="_blank">app

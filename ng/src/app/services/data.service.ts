@@ -12,7 +12,7 @@ export class DataService {
 
   getApp(sxcVersion: string, sysversion: string, sexyContentVersion: string, moduleId: string): any {
     const url = `https://2sxc.org/en/api/2sxc/app/App-Installer/api/AppInstaller/GetAutoInstallerApps?ModuleId=${moduleId}&SexyContentVersion=${sexyContentVersion}&platform=Dnn&sysversion=${sysversion}&sxcversion=${sxcVersion}`
-    return this.http.get(url).pipe(tap(data => console.log(data)))
+    return this.http.get(url);
   }
 }
 
