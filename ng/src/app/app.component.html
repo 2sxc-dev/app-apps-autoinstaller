@@ -8,30 +8,30 @@
     <div class="col-12 mt-3">
       <!-- Header -->
       <h2>Let's auto-install some popular apps (live)</h2>
-      <p class="mb-3">Don't worry: if you don't like one, you can remove it later without side-effects :) Our best pick for you is: Auto install apps for 2sxc 12.05</p>
+      <p class="mb-3">Don't worry: if you don't like one, you can remove it later without side-effects :) Our best pick
+        for you is: Auto install apps for 2sxc 12.05</p>
+    </div>
+  </div>
+
+  <!-- Buttons-->
+  <div class="d-flex flex-column flex-lg-row mb-3 w-100 ">
+    <div class="mb-2">
       <!-- Download Button -->
-      <button [disabled]="(selectedApps | async).length == 0" type="button" class="btn btn-primary mb-3"
+      <button [disabled]="(selectedApps | async).length == 0" type="button" class="btn btn-primary text-nowrap w-100"
         (click)="installApps()">
         <span>Install selected {{(selectedApps | async).length}} apps</span>
       </button>
     </div>
-    <div class="mb-2">
+    <!-- Selected Buttons -->
+    <div class="ms-0 ms-lg-3 mb-2">
+      <button type="button" class="btn btn-secondary btn-view-toggle" (click)="toggleSelection(true)">Select All</button>
+      <button type="button" class="btn btn-secondary btn-view-toggle ms-3" (click)="toggleSelection(false)">Unselect All</button>
+    </div>
+    <!-- Search  -->
+    <div class="ms-0 ms-lg-3 mb-2">
       <input class="form-control" [(ngModel)]="searchText" type="search" placeholder="Search..">
     </div>
-  </div>
-
-  <!-- toogle view -->
-  <div class="d-flex flex-column flex-md-row mb-3 w-100">
-    <div>
-      install button
-    </div>
-    <div class="">
-      <button type="button" class="btn btn-secondary me-2" (click)="toggleSelection(false)">Unselect All</button>
-      <button type="button" class="btn btn-secondary ms-2" (click)="toggleSelection(true)">Select All</button>
-    </div>
-    <div>
-      suche
-    </div>
+    <!-- View Button -->
     <div class="ms-auto">
       <mat-icon (click)="toggleView('tiles')" class="me-3">grid_on</mat-icon>
       <mat-icon (click)="toggleView('list')" class="me-3">list</mat-icon>
@@ -49,7 +49,8 @@
   <ng-container *ngIf="apps$ | async as apps">
     <!-- Tiles view -->
     <div *ngIf="isTilesView" class="row mb-2">
-      <div *ngFor="let app of apps | Search: searchText"  class="col-12 col-sm-6 col-md-6 col-lg-4 col-xxl-2 mb-3 app-view-tiles">
+      <div *ngFor="let app of apps | Search: searchText"
+        class="col-12 col-sm-6 col-md-6 col-lg-4 col-xxl-2 mb-3 app-view-tiles">
         <div class="h-100 card-grid card bg-light">
           <div class="row g-0 position-relative">
             <div class="col-md-4 d-flex align-items-center">

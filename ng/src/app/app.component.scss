@@ -1,3 +1,7 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
 // app-view-tiles classen
 .app-view-tiles {
   .card-grid {
@@ -55,7 +59,7 @@ small a {
 }
 
 .form-control {
-  max-width: 250px;
+  max-width: 100%;
 }
 
 mat-icon {
@@ -70,4 +74,10 @@ mat-icon {
 
 ::ng-deep #to-shine-page-footer {
   display: none !important;
+}
+
+@include media-breakpoint-down(lg)  {
+  .btn-view-toggle {
+    width: calc(50% - (1rem / 2));
+  }
 }
