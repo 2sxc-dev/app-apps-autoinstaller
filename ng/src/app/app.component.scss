@@ -32,8 +32,16 @@
 
 // app-view-list classen
 .app-view-list {
-  padding-bottom: 10px;
   border-bottom: 1px solid rgba(177, 177, 177, 0.45);
+
+  &:hover {
+    transition: all 225ms ease-in-out;
+    background-color: lightgray;
+  }
+.check-size{
+  width: 20px;
+  height: 20px;
+}
 }
 
 //allgemeine classes

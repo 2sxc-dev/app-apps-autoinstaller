@@ -7,7 +7,7 @@ export class SearchPipe implements PipeTransform {
 
   transform(data: any, searchValue?: any): any {
     return data.filter((item: any) => {
-      return item.displayName.toLocaleLowerCase().startsWith(searchValue.toLowerCase());
+      return item.displayName.toLocaleLowerCase().includes(searchValue.toLowerCase());
     })
   }
 

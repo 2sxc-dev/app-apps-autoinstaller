@@ -24,12 +24,13 @@
     </div>
     <!-- Selected Buttons -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <button type="button" class="btn btn-secondary btn-view-toggle" (click)="toggleSelection(true)">Select All</button>
-      <button type="button" class="btn btn-secondary btn-view-toggle ms-3" (click)="toggleSelection(false)">Unselect All</button>
+      <button type="button" class="btn btn-secondary btn-view-toggle " (click)="toggleSelection(false)">Unselect All</button>
+      <button type="button" class="btn btn-secondary btn-view-toggle ms-3" (click)="toggleSelection(true)">Select All</button>
+
     </div>
     <!-- Search  -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <input class="form-control" [(ngModel)]="searchText" type="search" placeholder="Search..">
+      <input class="form-control" [(ngModel)]="searchText" type="search" placeholder="Search...">
     </div>
     <!-- View Button -->
     <div class="ms-auto">
@@ -38,19 +39,19 @@
     </div>
   </div>
 
+  <p>In case you're wondering, we'll install the following apps:</p>
+
   <div *ngIf="(apps$ | async)?.length == 0" class="alert alert-danger" role="alert">
     ERROR:
     There is no app for this version
   </div>
-
-  <p>In case you're wondering, we'll install the following apps:</p>
 
   <!-- Alle Apps -->
   <ng-container *ngIf="apps$ | async as apps">
     <!-- Tiles view -->
     <div *ngIf="isTilesView" class="row mb-2">
       <div *ngFor="let app of apps | Search: searchText"
-        class="col-12 col-sm-6 col-md-6 col-lg-4 col-xxl-2 mb-3 app-view-tiles">
+        class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles">
         <div class="h-100 card-grid card bg-light">
           <div class="row g-0 position-relative">
             <div class="col-md-4 d-flex align-items-center">
@@ -78,10 +79,9 @@
 
     <!-- List view -->
     <div *ngIf="!isTilesView">
-      <div *ngFor="let app of apps | Search: searchText" class="d-flex align-items-center mb-2 app-view-list ">
-        <input class="me-3" type="checkbox" (click)="changeValue(app, app.urlKey)" [(ngModel)]="app.isSelected"
-          [(value)]="app.urlKey">
-        <div class="d-flex align-items-center">
+      <div *ngFor="let app of apps | Search: searchText" class="d-flex align-items-center p-2 app-view-list w-100 ">
+
+        <div class="d-flex align-items-center ">
           <img src="https://2sxc.org/{{app.icon}}?w=50" class="img-fluid rounded-start align-items-center" alt="...">
         </div>
         <div class="ms-3 ">
@@ -90,7 +90,13 @@
           <small><a class="version-link" href="{{app.gitHub}}" target="_blank">(package
               {{app.version}})</a></small>
         </div>
+        <div class="ms-auto">
+          <input class="check-size" type="checkbox" (click)="changeValue(app, app.urlKey)" [(ngModel)]="app.isSelected"
+          [(value)]="app.urlKey">
+        </div>
+
       </div>
+
     </div>
   </ng-container>
 
