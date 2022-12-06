@@ -1,5 +1,6 @@
 export interface Apps {
   downloadUrl: string;
+  url?: string;
   displayName: string;
   icon: string;
   version?: string;
@@ -10,5 +11,5 @@ export interface Apps {
   minDnn: string;
   min2Sxc: string;
   minOqt: string;
-
 }
+

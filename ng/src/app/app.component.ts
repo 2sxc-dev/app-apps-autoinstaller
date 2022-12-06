@@ -1,7 +1,7 @@
 import { Component, ElementRef } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
 import { Apps } from './app-interface';
-import { BehaviorSubject, combineLatestWith, delay, map, Observable, tap } from 'rxjs';
+import { ArgumentOutOfRangeError, BehaviorSubject, combineLatestWith, delay, map, Observable, tap } from 'rxjs';
 import { DataService } from './services/data.service';
 
 @Component({
@@ -26,12 +26,12 @@ export class AppComponent extends SxcAppComponent {
   params = new URLSearchParams(window.location.search);
   sxcVersion = this.params.get("sxcversion");
   sysversion = this.params.get("sysversion");
-  sexyContentVersion = this.params.get("SexyContentVersion");
+  sexyContentVersion = this.params.get("2SexyContentVersion");
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
 
   ngOnInit(): void {
-    this.hasUrlParams = this.params.has("sysversion") && this.params.has("sxcversion") && this.params.has("SexyContentVersion");
+    this.hasUrlParams = this.params.has("sysversion") && this.params.has("sxcversion") && this.params.has("2SexyContentVersion");
 
     this.isAllSelected = new BehaviorSubject(true); // zuerst sind alle checkboxen ausgewählt und true
     this.selectedApps = new BehaviorSubject([]); //hier werden die ausgewählten elemente hinzugefügt
@@ -65,6 +65,7 @@ export class AppComponent extends SxcAppComponent {
     const found = this.selectedAppsArr.some((app: Apps) => app.urlKey == urlKey); // finde die app, bei der die app.urlKey und urlkey gleich sind
 
     if (!found) {
+      console.log(app)
       this.selectedAppsArr.push(app) // pusht die neue app in das Array und es wir vergrössert
     } else {
       const indexOfApps = this.selectedAppsArr.findIndex((app: Apps) => { // wird benötigt um den index herauszufinden
@@ -78,7 +79,11 @@ export class AppComponent extends SxcAppComponent {
   }
 
   installApps() {
-    var message = { 'action': 'install', 'moduleId': 'window.ModuleId', 'packages': this.selectedAppsArr }; // werte die übergeben werden wie z.b. die ausgewählten Apps
+    const appsToInstall = this.selectedAppsArr.map(data => {
+      return { displayName: data.displayName, url: data.downloadUrl };
+    });
+
+    var message = { 'action': 'install', 'moduleId': 'window.ModuleId', 'packages': appsToInstall }; // werte die übergeben werden wie z.b. die ausgewählten Apps
     window.parent.postMessage(JSON.stringify(message), '*'); // message wir an das übergeortente fenster weitergeben / der code wird mit Iframe eingebunden
   }
 

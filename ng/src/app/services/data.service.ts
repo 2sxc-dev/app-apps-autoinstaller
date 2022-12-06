@@ -15,6 +15,3 @@ export class DataService {
     return this.http.get(url);
   }
 }
-
-
-  //https://2sxc.org/en/2sic-funktionstestseite/autoinstaller-test?ModuleId=1199&SexyContentVersion=13.11.00&platform=Dnn&sysversion=9.1.1&sxcversion=11.07.03
