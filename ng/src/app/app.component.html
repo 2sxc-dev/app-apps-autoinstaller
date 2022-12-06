@@ -24,8 +24,10 @@
     </div>
     <!-- Selected Buttons -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <button type="button" class="btn btn-secondary btn-view-toggle " (click)="toggleSelection(false)">Unselect All</button>
-      <button type="button" class="btn btn-secondary btn-view-toggle ms-3" (click)="toggleSelection(true)">Select All</button>
+      <button type="button" class="btn btn-secondary btn-view-toggle " (click)="toggleSelection(false)">Unselect
+        All</button>
+      <button type="button" class="btn btn-secondary btn-view-toggle ms-3" (click)="toggleSelection(true)">Select
+        All</button>
 
     </div>
     <!-- Search  -->
@@ -50,31 +52,36 @@
   <ng-container *ngIf="apps$ | async as apps">
     <!-- Tiles view -->
     <div *ngIf="isTilesView" class="row mb-2">
-      <div *ngFor="let app of apps | Search: searchText"
-        class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles">
-        <div class="h-100 card-grid card bg-light">
-          <div class="row g-0 position-relative">
-            <div class="col-md-4 d-flex align-items-center">
-              <img src="https://2sxc.org/{{app.icon}}?w=800" class="img-fluid rounded-start align-items-center"
-                alt="...">
-            </div>
-            <div class="col-md-8">
-              <div class="card-body px-xxl-3 py-3 py-md-0 h-100 d-flex flex-column justify-content-center">
-                <h5 class="fs-6 card-title mb-1"><a target="_blank"
-                    href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
-                <div class="card-text">
-                  <small><a class="version-link" href="{{app.gitHub}}" target="_blank">({{app.version}})</a></small>
-                  <!-- <p class= "d-none': isTilesView, 'd-flex': !isTilesView, 'mt-4': true}">{{app.shortDescription}}
-                      </p> -->
-                  <input class="checkbox-item" type="checkbox" (click)="changeValue(app, app.urlKey)"
-                    [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
+      <ng-container *ngFor="let app of apps | Search: searchText">
+        <div class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles" *ngIf="!app.isForbidden">
+          <div class="h-100 card-grid card bg-light ">
+            <!-- div click -->
+            <div class="row g-0 position-relative cc" (click)="changeValue(app, app.urlKey)" (value)="app.urlKey"
+              (ngModel)="app.isSelected">
+              <div class="col-md-4 d-flex align-items-center">
+                <img src="https://2sxc.org/{{app.icon}}?w=800" class="img-fluid rounded-start align-items-center"
+                  alt="...">
+              </div>
+              <div class="col-md-8">
+                <div class="card-body px-xxl-3 py-3 py-md-0 h-100 d-flex flex-column justify-content-center">
+                  <h5 class="fs-6 card-title mb-1"><a target="_blank"
+                      href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
+                  <div class="card-text">
+                    <small><a class="version-link" href="{{app.gitHub}}" target="_blank">
+                        <mat-icon>folder_zip</mat-icon>
+                      </a></small>
+                    <input class="checkbox-item check-size" type="checkbox" (click)="changeValue(app, app.urlKey)"
+                      [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
+                  </div>
+                  <!-- https://stackblitz.com/edit/angular-base-simple-scss-hf9hrp?file=src%2Fapp%2Fapp.component.html -->
+                  <!-- <a href="https://2sxc.org/apps/app/{{app.urlKey}}" target="_blank" class="stretched-link"></a> -->
                 </div>
-                <a href="https://2sxc.org/apps/app/{{app.urlKey}}" target="_blank" class="stretched-link"></a>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </ng-container>
+
     </div>
 
     <!-- List view -->
@@ -87,12 +94,15 @@
         <div class="ms-3 w-50 w-md-100 ">
           <h5 class="fs-6 mb-0 card-title ff"><a target="_blank"
               href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
-          <small><a class="version-link" href="{{app.gitHub}}" target="_blank">(package
-              {{app.version}})</a></small>
+          <small><a class="version-link" href="{{app.gitHub}}" target="_blank">
+              <mat-icon>folder_zip</mat-icon>
+            </a></small>
+          <!-- <p class= "d-none': isTilesView, 'd-flex': !isTilesView, 'mt-4': true}">{{app.shortDescription}}</p> -->
         </div>
+
         <div class="ms-auto">
           <input class="check-size" type="checkbox" (click)="changeValue(app, app.urlKey)" [(ngModel)]="app.isSelected"
-          [(value)]="app.urlKey">
+            [(value)]="app.urlKey">
         </div>
 
       </div>

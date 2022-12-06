@@ -2,6 +2,10 @@
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
 
+.cc{
+  cursor: pointer;
+}
+
 // app-view-tiles classen
 .app-view-tiles {
   .card-grid {
@@ -24,11 +28,9 @@
     position: relative;
   }
 
-  .checkbox-item {
-    z-index: 2;
-    cursor: pointer;
-  }
+
 }
+
 
 // app-view-list classen
 .app-view-list {
@@ -38,13 +40,15 @@
     transition: all 225ms ease-in-out;
     background-color: lightgray;
   }
-.check-size{
-  width: 20px;
-  height: 20px;
-}
+
 }
 
 //allgemeine classes
+.check-size{
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
 a {
   text-decoration: none;
 }
