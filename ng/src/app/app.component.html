@@ -3,7 +3,6 @@
 </div>
 
 <div *ngIf="hasUrlParams" class="container-fluid">
-
   <div class="row mb-2">
     <div class="col-12 mt-3">
       <!-- Header -->
@@ -17,7 +16,7 @@
   <div class="d-flex flex-column flex-lg-row mb-3 w-100 ">
     <div class="mb-2">
       <!-- Download Button -->
-      <button [disabled]="(selectedApps | async).length == 0" type="button" class="btn btn-primary text-nowrap w-100"
+      <button [disabled]="(selectedApps | async).length == 0" type="button" class="btn btn-darkblue text-nowrap w-100"
         (click)="installApps()">
         <span>Install selected {{(selectedApps | async).length}} apps</span>
       </button>
@@ -54,10 +53,8 @@
     <div *ngIf="isTilesView" class="row mb-2">
       <ng-container *ngFor="let app of apps | Search: searchText">
         <div class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles" *ngIf="!app.isForbidden">
-          <div class="h-100 card-grid card bg-light ">
-            <!-- div click -->
-            <div class="row g-0 position-relative cc" (click)="changeValue(app, app.urlKey)" (value)="app.urlKey"
-              (ngModel)="app.isSelected">
+          <div class="h-100 card-grid card bg-light">
+            <div class="row g-0 position-relative app-view-item" (click)="changeValue($event, app, app.urlKey)">
               <div class="col-md-4 d-flex align-items-center">
                 <img src="https://2sxc.org/{{app.icon}}?w=800" class="img-fluid rounded-start align-items-center"
                   alt="...">
@@ -67,14 +64,11 @@
                   <h5 class="fs-6 card-title mb-1"><a target="_blank"
                       href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
                   <div class="card-text">
-                    <small><a class="version-link" href="{{app.gitHub}}" target="_blank">
-                        <mat-icon>folder_zip</mat-icon>
-                      </a></small>
-                    <input class="checkbox-item check-size" type="checkbox" (click)="changeValue(app, app.urlKey)"
-                      [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
+                    <a class="version-link" href="{{app.gitHub}}" target="_blank"><mat-icon>folder_zip</mat-icon></a>
+
+                    <input class="checkbox-item check-size" type="checkbox" [(ngModel)]="app.isSelected"
+                      [(value)]="app.urlKey">
                   </div>
-                  <!-- https://stackblitz.com/edit/angular-base-simple-scss-hf9hrp?file=src%2Fapp%2Fapp.component.html -->
-                  <!-- <a href="https://2sxc.org/apps/app/{{app.urlKey}}" target="_blank" class="stretched-link"></a> -->
                 </div>
               </div>
             </div>
@@ -86,23 +80,20 @@
 
     <!-- List view -->
     <div *ngIf="!isTilesView">
-      <div *ngFor="let app of apps | Search: searchText" class="d-flex align-items-center p-2 app-view-list w-100 ">
+      <div *ngFor="let app of apps | Search: searchText" class="d-flex align-items-center p-2 app-view-list w-100"
+        (click)="changeValue($event, app, app.urlKey)">
 
         <div class="d-flex align-items-center ">
           <img src="https://2sxc.org/{{app.icon}}?w=50" class="img-fluid rounded-start align-items-center" alt="...">
         </div>
         <div class="ms-3 w-50 w-md-100 ">
-          <h5 class="fs-6 mb-0 card-title ff"><a target="_blank"
+          <h5 class="fs-6 mb-0"><a target="_blank"
               href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
-          <small><a class="version-link" href="{{app.gitHub}}" target="_blank">
-              <mat-icon>folder_zip</mat-icon>
-            </a></small>
-          <!-- <p class= "d-none': isTilesView, 'd-flex': !isTilesView, 'mt-4': true}">{{app.shortDescription}}</p> -->
+          <a class="version-link" href="{{app.gitHub}}" target="_blank"><mat-icon>folder_zip</mat-icon></a>
         </div>
 
         <div class="ms-auto">
-          <input class="check-size" type="checkbox" (click)="changeValue(app, app.urlKey)" [(ngModel)]="app.isSelected"
-            [(value)]="app.urlKey">
+          <input class="check-size" type="checkbox" [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
         </div>
 
       </div>
@@ -111,9 +102,10 @@
   </ng-container>
 
   <div class="row">
-    <p>This dialog will disappear when you've added or created your first app. It will appear again on every new portal,
+    <p>
+      This dialog will disappear when you've added or created your first app. It will appear again on every new portal,
       as the apps are per portal. If you want to add more apps later on, just get them from the <a
-        href="https://2sxc.org/apps" target="_blank">app
-        catalog</a></p>
+        href="https://2sxc.org/apps" target="_blank">app catalog</a>
+    </p>
   </div>
 </div>

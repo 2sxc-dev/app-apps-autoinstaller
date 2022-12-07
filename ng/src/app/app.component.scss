@@ -2,21 +2,25 @@
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
 
-.cc{
-  cursor: pointer;
-}
+$darkblue:    #022f5a ;
 
 // app-view-tiles classen
 .app-view-tiles {
+  .app-view-item {
+    cursor: pointer;
+  }
+
   .card-grid {
     &:hover {
       transition: all 225ms ease-in-out;
       box-shadow: 2px 9px 18px 6px rgba(153, 153, 153, 0.45);
     }
   }
+
   .card-text {
     margin: 0;
   }
+
   .checkbox-item {
     position: absolute;
     bottom: 8px;
@@ -27,33 +31,43 @@
     z-index: 2;
     position: relative;
   }
-
-
 }
-
 
 // app-view-list classen
 .app-view-list {
   border-bottom: 1px solid rgba(177, 177, 177, 0.45);
+  cursor: pointer;
 
   &:hover {
     transition: all 225ms ease-in-out;
     background-color: lightgray;
   }
+}
 
+.btn-darkblue {
+  background-color: $darkblue;
+  color: white;
+  transition: all 225ms ease-in-out;
+  &:hover{
+    background-color: lighten( $darkblue, 5);
+    color: white;
+  }
 }
 
 //allgemeine classes
-.check-size{
+.check-size {
   width: 20px;
   height: 20px;
   cursor: pointer;
+  display: block;
 }
+
 a {
+  color: $darkblue;
   text-decoration: none;
 }
 
-.card-title {
+h5 {
   overflow: hidden;
   text-overflow: ellipsis;
   display: inline-block;
@@ -65,19 +79,19 @@ img {
   border-radius: 16px 0 16px 0;
 }
 
-small a {
-  color: rgba(0, 0, 255, 0.5);
-  z-index: 10;
-}
-
 .form-control {
   max-width: 100%;
 }
 
-mat-icon {
-  cursor: pointer;
+input {
+  accent-color:$darkblue;
 }
-//
+
+@include media-breakpoint-down(lg)  {
+  .btn-view-toggle {
+    width: calc(50% - (1rem / 2));
+  }
+}
 
 // zum den Header und footer ausblenden
 ::ng-deep #to-shine-page-navigation {
@@ -86,10 +100,4 @@ mat-icon {
 
 ::ng-deep #to-shine-page-footer {
   display: none !important;
-}
-
-@include media-breakpoint-down(lg)  {
-  .btn-view-toggle {
-    width: calc(50% - (1rem / 2));
-  }
 }

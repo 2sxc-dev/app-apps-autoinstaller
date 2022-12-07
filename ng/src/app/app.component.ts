@@ -80,8 +80,8 @@ export class AppComponent extends SxcAppComponent {
 
         apps.sort((a, b) => a.displayName.localeCompare(b.displayName)) // Sotieren von A - Z
 
-        console.log(apps)
-        console.log(this.selectedAppsArr)
+        // console.log(apps)
+        // console.log(this.selectedAppsArr)
 
         return apps; // gib die apps mit dem neuen status in die apps$ zurück auf die wir später zugreiffen
       }),
@@ -92,22 +92,26 @@ export class AppComponent extends SxcAppComponent {
     )
   }
 
-  changeValue(app: Apps, urlKey: string) { // über gibt die app und die urlKey
+  changeValue(event: any, app: Apps, urlKey: string) { // über gibt die app und die urlKey
     const found = this.selectedAppsArr.some((app: Apps) => app.urlKey == urlKey); // finde die app, bei der die app.urlKey und urlkey gleich sind
-    //test click div
-    console.log('div click works')
-    console.log(urlKey)
-    console.log(this.selectedAppsArr)
+
+
+    if (event.target.tagName == 'A' || event.target.tagName == 'MAT-ICON' )
+     return ;
 
     if (!found) {
+      app.isSelected = true;
       this.selectedAppsArr.push(app) // pusht die neue app in das Array und es wir vergrössert
     } else {
+      app.isSelected = false;
       const indexOfApps = this.selectedAppsArr.findIndex((app: Apps) => { // wird benötigt um den index herauszufinden
         return app.urlKey === urlKey; // finde die app, bei der die app.urlKey und die urlKey übereinander stimmt
       });
 
       this.selectedAppsArr.splice(indexOfApps, 1); // objekt wir an stelle Index aus dem arry entfernt
     }
+
+    console.log(this.selectedAppsArr)
 
     this.selectedApps.next(this.selectedAppsArr) // füge das array in das behaviorsubjcet zu, so dass es verändernungen mit bekommt
   }
