@@ -4,6 +4,7 @@ import { Apps } from './app-interface';
 import { BehaviorSubject, combineLatestWith, delay, map, Observable, share, tap } from 'rxjs';
 import { DataService } from './services/data.service';
 import { FormControl, FormGroup } from '@angular/forms';
+import { APPS } from './mock-up';
 
 @Component({
   selector: 'app-root',
@@ -60,49 +61,48 @@ export class AppComponent extends SxcAppComponent {
 
     this.searchForm.valueChanges.subscribe(value => this.serachString.next(value))
 
-    /*
-    const appsFilteredByRules$.pipe(this.dataService.getApp(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId), this.rules)
 
-    const appsFilteredByString$.pipe(appsFilteredByRules$, this.searchString)
-    */
-
-    /*
-    this.apps$ = appsFilteredByRules$.pipe(
-      combineLatestWith(this.isAllSelected, appsFilteredByString$)
-    */
-
-    this.apps$ = this.dataService.getApp(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId).pipe(
-      combineLatestWith(this.isAllSelected, this.rules, this.serachString), // abhänigkeit von apps$ ist das Mockup APPS und die selected
-      map(([apps, allSelected, rules, serachString]) => {
-        console.log(apps)
-
-        const searchedApps =  apps.filter((item: any) => {
-          return item.displayName.toLocaleLowerCase().includes(serachString.toLowerCase());
-        })
-
-        this.selectedAppsArr = []; // erstelle ein leeres Array
-
+    const appsFilteredByRules$ = this.dataService.getApp(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId).pipe(
+      combineLatestWith(this.rules),
+      map(([apps, rules]) => {
         var allForbidden = rules.filter(rule => rule.mode == 'f' && rule.target == 'all').length >= 1;
         allForbidden = false; // zum testen
 
         if (allForbidden)
           return [];
 
-        console.log(apps[0])
+        const forbiddenApps = apps.filter(app => rules.filter(rule => rule.mode == 'f' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
+        const allowedApps = apps.filter(app => !forbiddenApps.includes(app))
 
-        apps.forEach(app => {
+        allowedApps.forEach(app => {
           const isOptional = rules.filter(rule => rule.mode == 'o' && rule.target == 'guid' && rule.appGuid == app.guid).length == 1;
 
-          app.isSelected = isOptional && !allSelected.forced ? false : allSelected.selected;
-          app.isForbidden = rules.filter(rule => rule.mode == 'f' && rule.target == 'guid' && rule.appGuid == app.guid).length == 1 // hier muss die abfrage auf die rules
+          app.isSelected = isOptional ? false : true;
+        });
 
-          if (app.isSelected && !app.isForbidden) { // wenn app selectet ist
+        allowedApps.sort((a, b) => a.displayName.localeCompare(b.displayName)) // Sotieren von A - Z
+
+        return allowedApps;
+      })
+    )
+
+
+    this.apps$ = appsFilteredByRules$.pipe(
+      combineLatestWith(this.isAllSelected, this.serachString), // abhänigkeit von apps$ ist das Mockup APPS und die selected
+      map(([apps, allSelected, serachString]) => {
+        const searchedApps = apps.filter((item: any) => {
+          return item.displayName.toLocaleLowerCase().includes(serachString.toLowerCase());
+        })
+
+        this.selectedAppsArr = []; // erstelle ein leeres Array
+
+        apps.forEach(app => {
+          // app.isSelected = isOptional && !allSelected.forced ? false : allSelected.selected;
+
+          if (app.isSelected) { // wenn app selectet ist
             this.selectedAppsArr.push(app) // füge die app in das Arry hinzu wenn es ausgewählt wird
           }
         });
-
-        apps.sort((a, b) => a.displayName.localeCompare(b.displayName)) // Sotieren von A - Z
-
 
         return searchedApps; // gib die apps mit dem neuen status in die apps$ zurück auf die wir später zugreiffen
       }),

@@ -49,7 +49,7 @@
     <!-- Tiles view -->
     <div *ngIf="isTilesView" class="row mb-2">
       <ng-container *ngFor="let app of apps | Search: searchText">
-        <div class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles" *ngIf="!app.isForbidden">
+        <div class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles">
           <div class="h-100 card-grid card bg-light">
             <div class="row g-0 position-relative app-view-item" (click)="toggleSelectedApp($event, app, app.urlKey)">
               <div class="col-md-4 d-flex align-items-center">
