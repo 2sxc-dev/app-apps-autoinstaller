@@ -16,22 +16,19 @@
   <div class="d-flex flex-column flex-lg-row mb-3 w-100 ">
     <div class="mb-2">
       <!-- Download Button -->
-      <button [disabled]="(selectedApps | async).length == 0" type="button" class="btn btn-darkblue text-nowrap w-100"
-        (click)="installApps()">
+      <button [disabled]="(selectedApps | async).length == 0" type="button" class="btn btn-darkblue text-nowrap w-100" (click)="postAppsToInstall()">
         <span>Install selected {{(selectedApps | async).length}} apps</span>
       </button>
     </div>
     <!-- Selected Buttons -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <button type="button" class="btn btn-secondary btn-view-toggle " (click)="toggleSelection(false)">Unselect
-        All</button>
-      <button type="button" class="btn btn-secondary btn-view-toggle ms-3" (click)="toggleSelection(true)">Select
-        All</button>
+      <button type="button" class="btn btn-secondary btn-view-toggle " (click)="toggleAppSelection(false)">Unselect All</button>
+      <button type="button" class="btn btn-secondary btn-view-toggle ms-3" (click)="toggleAppSelection(true)">Select All</button>
 
     </div>
     <!-- Search  -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <input class="form-control" [(ngModel)]="searchText" type="search" placeholder="Search...">
+      <input class="form-control" [formControl]="searchForm" type="search" placeholder="Search...">
     </div>
     <!-- View Button -->
     <div class="ms-auto">
@@ -54,7 +51,7 @@
       <ng-container *ngFor="let app of apps | Search: searchText">
         <div class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles" *ngIf="!app.isForbidden">
           <div class="h-100 card-grid card bg-light">
-            <div class="row g-0 position-relative app-view-item" (click)="changeValue($event, app, app.urlKey)">
+            <div class="row g-0 position-relative app-view-item" (click)="toggleSelectedApp($event, app, app.urlKey)">
               <div class="col-md-4 d-flex align-items-center">
                 <img src="https://2sxc.org/{{app.icon}}?w=800" class="img-fluid rounded-start align-items-center"
                   alt="...">
@@ -81,7 +78,7 @@
     <!-- List view -->
     <div *ngIf="!isTilesView">
       <div *ngFor="let app of apps | Search: searchText" class="d-flex align-items-center p-2 app-view-list w-100"
-        (click)="changeValue($event, app, app.urlKey)">
+        (click)="toggleSelectedApp($event, app, app.urlKey)">
 
         <div class="d-flex align-items-center ">
           <img src="https://2sxc.org/{{app.icon}}?w=50" class="img-fluid rounded-start align-items-center" alt="...">
