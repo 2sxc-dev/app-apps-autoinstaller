@@ -22,8 +22,8 @@
     </div>
     <!-- Selected Buttons -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <button type="button" class="btn btn-secondary btn-view-toggle " (click)="toggleAppSelection(false)">Unselect All</button>
-      <button type="button" class="btn btn-secondary btn-view-toggle ms-3" (click)="toggleAppSelection(true)">Select All</button>
+      <button type="button" class="btn btn-secondary btn-select-toggle" (click)="toggleAppSelection(false)">Unselect All</button>
+      <button type="button" class="btn btn-secondary btn-select-toggle ms-3" (click)="toggleAppSelection(true)">Select All</button>
 
     </div>
     <!-- Search  -->
@@ -31,7 +31,7 @@
       <input class="form-control" [formControl]="searchForm" type="search" placeholder="Search...">
     </div>
     <!-- View Button -->
-    <div class="ms-auto">
+    <div class="view-toggle ms-auto">
       <mat-icon (click)="toggleView('tiles')" class="me-3">grid_on</mat-icon>
       <mat-icon (click)="toggleView('list')" class="me-3">list</mat-icon>
     </div>
@@ -40,15 +40,14 @@
   <p>In case you're wondering, we'll install the following apps:</p>
 
   <div *ngIf="(apps$ | async)?.length == 0" class="alert alert-danger" role="alert">
-    ERROR:
-    There is no app for this version
+    ERROR: There is no app for this version
   </div>
 
   <!-- Alle Apps -->
   <ng-container *ngIf="apps$ | async as apps">
     <!-- Tiles view -->
     <div *ngIf="isTilesView" class="row mb-2">
-      <ng-container *ngFor="let app of apps | Search: searchText">
+      <ng-container *ngFor="let app of apps">
         <div class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles">
           <div class="h-100 card-grid card bg-light">
             <div class="row g-0 position-relative app-view-item" (click)="toggleSelectedApp($event, app, app.urlKey)">
@@ -77,7 +76,7 @@
 
     <!-- List view -->
     <div *ngIf="!isTilesView">
-      <div *ngFor="let app of apps | Search: searchText" class="d-flex align-items-center p-2 app-view-list w-100"
+      <div *ngFor="let app of apps " class="d-flex align-items-center p-2 app-view-list w-100"
         (click)="toggleSelectedApp($event, app, app.urlKey)">
 
         <div class="d-flex align-items-center ">

@@ -27,7 +27,7 @@ export class AppComponent extends SxcAppComponent {
   isTilesView: boolean = true; // view von tile zu list je nach dem andere klassen einblenden, beim start tile
 
   // SEARCH STRING FOR SEARCH PIPE
-  searchText: string = '';
+
   searchForm = new FormControl();
 
   // URL PARAMETERS
@@ -49,6 +49,7 @@ export class AppComponent extends SxcAppComponent {
   }
 
   ngOnInit(): void {
+
     var message = { 'action': 'specs', 'moduleId': this.moduleId };
     window.parent.postMessage(JSON.stringify(message), '*');
 
@@ -60,7 +61,6 @@ export class AppComponent extends SxcAppComponent {
     this.serachString = new BehaviorSubject('');
 
     this.searchForm.valueChanges.subscribe(value => this.serachString.next(value))
-
 
     const appsFilteredByRules$ = this.dataService.getApp(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId).pipe(
       combineLatestWith(this.rules),
@@ -76,7 +76,6 @@ export class AppComponent extends SxcAppComponent {
 
         allowedApps.forEach(app => {
           const isOptional = rules.filter(rule => rule.mode == 'o' && rule.target == 'guid' && rule.appGuid == app.guid).length == 1;
-
           app.isSelected = isOptional ? false : true;
         });
 
@@ -97,7 +96,7 @@ export class AppComponent extends SxcAppComponent {
         this.selectedAppsArr = []; // erstelle ein leeres Array
 
         apps.forEach(app => {
-          // app.isSelected = isOptional && !allSelected.forced ? false : allSelected.selected;
+          app.isSelected = allSelected.forced ? allSelected.selected : app.isSelected;
 
           if (app.isSelected) { // wenn app selectet ist
             this.selectedAppsArr.push(app) // füge die app in das Arry hinzu wenn es ausgewählt wird
@@ -134,7 +133,6 @@ export class AppComponent extends SxcAppComponent {
 
     this.selectedApps.next(this.selectedAppsArr) // füge das array in das behaviorsubjcet zu, so dass es verändernungen mit bekommt
 
-    console.log(this.selectedAppsArr)
   }
 
   postAppsToInstall() {

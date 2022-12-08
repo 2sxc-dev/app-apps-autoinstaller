@@ -87,8 +87,14 @@ input {
   accent-color:$darkblue;
 }
 
+.view-toggle {
+  .mat-icon {
+    cursor: pointer;
+  }
+}
+
 @include media-breakpoint-down(lg)  {
-  .btn-view-toggle {
+  .btn-select-toggle {
     width: calc(50% - (1rem / 2));
   }
 }
