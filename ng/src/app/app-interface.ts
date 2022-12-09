@@ -13,3 +13,10 @@ export interface Apps {
   minOqt: string;
 }
 
+export interface Rules {
+  name: string;
+  appGuid: string;
+  mode: string;
+  target: string;
+  url: string;
+}

@@ -1,10 +1,9 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
-import { Apps } from './app-interface';
-import { BehaviorSubject, combineLatestWith, delay, map, Observable, share, tap } from 'rxjs';
+import { Apps, Rules } from './app-interface';
+import { BehaviorSubject, combineLatestWith, debounceTime, delay, map, Observable, share, tap } from 'rxjs';
 import { DataService } from './services/data.service';
-import { FormControl, FormGroup } from '@angular/forms';
-import { APPS } from './mock-up';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-root',
@@ -16,17 +15,22 @@ export class AppComponent extends SxcAppComponent {
     super(el, context);
   }
 
-  apps$!: Observable<Apps[]>; //alle apps als observable, greifen hier im html mit async darauf zurück
-  selectedApps!: BehaviorSubject<Apps[]>; //hilfe observable anzahl in html anzuzeigen
-  rules!: BehaviorSubject<any>;
-  serachString!: BehaviorSubject<any>;
+  appsFilteredByRules$!: Observable<Apps[]>; //all apps from the service
+  rules!: BehaviorSubject<Rules[]>; // rules from 2sxc
+  apps$!: Observable<Apps[]>; //all apps filtered by rules
+  searchString!: BehaviorSubject<string>;
 
-  selectedAppsArr: Apps[] = []; // array welches wir mit ausgewählten Apps befühlen / ist kein observable
+  searchedAppsLenght: number;
+  selectedLength: number;
+  isSelectLenghtNull: boolean
+  unSelectedLength: number;
+  isUnSelectLenghtNull: boolean
+  selectedApp!: BehaviorSubject<Apps>;
+  selectedAppCounter: number;
+  selectedApps: Apps[];
 
-  isAllSelected!: BehaviorSubject<{}>; // observable mit true oder false der selecte box auszuwählten / abzuwählen
-  isTilesView: boolean = true; // view von tile zu list je nach dem andere klassen einblenden, beim start tile
-
-  // SEARCH STRING FOR SEARCH PIPE
+  isAllSelected!: BehaviorSubject<any>; // observable to select / deselect with true or false of the selecte box
+  isTilesView: boolean = true; // view from tile to list depending on which other classes are shown, at start tile
 
   searchForm = new FormControl();
 
@@ -38,6 +42,7 @@ export class AppComponent extends SxcAppComponent {
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
 
+  // Message received from the outer window
   @HostListener('window:message', ['$event']) onPostMessage(event) {
     if (typeof event.data == 'string') {
       const messageDate = JSON.parse(event.data);
@@ -49,27 +54,41 @@ export class AppComponent extends SxcAppComponent {
   }
 
   ngOnInit(): void {
-
+    // send a specs message from the Ifram to the outer window
     var message = { 'action': 'specs', 'moduleId': this.moduleId };
     window.parent.postMessage(JSON.stringify(message), '*');
 
     this.hasUrlParams = this.params.has("sysversion") && this.params.has("sxcversion") && this.params.has("2SexyContentVersion");
 
-    this.isAllSelected = new BehaviorSubject({ selected: true, forced: false }); // zuerst sind alle checkboxen ausgewählt und true
-    this.selectedApps = new BehaviorSubject([]); //hier werden die ausgewählten elemente hinzugefügt
-    this.rules = new BehaviorSubject([]); //hier werden die ausgewählten elemente hinzugefügt
-    this.serachString = new BehaviorSubject('');
+    this.isAllSelected = new BehaviorSubject({ selected: true, forced: false }); // Select all Checkbox
+    this.rules = new BehaviorSubject<Rules[]>([]);
+    this.searchString = new BehaviorSubject('');
+    this.selectedApp = new BehaviorSubject(<Apps>{});
 
-    this.searchForm.valueChanges.subscribe(value => this.serachString.next(value))
+    this.searchForm.valueChanges.pipe(
+      debounceTime(0) // 300-400 ms
+    ).subscribe(value => {
+      this.isAllSelected.next({ selected: true, forced: false });
+      this.searchString.next(value)
+    })
 
-    const appsFilteredByRules$ = this.dataService.getApp(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId).pipe(
+    // filter data from the service according to the rules
+    this.appsFilteredByRules$ = this.dataService.getApp(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId).pipe(
       combineLatestWith(this.rules),
       map(([apps, rules]) => {
         var allForbidden = rules.filter(rule => rule.mode == 'f' && rule.target == 'all').length >= 1;
-        allForbidden = false; // zum testen
 
-        if (allForbidden)
+        //Demo
+        // allForbidden = false; // zum testen
+        //Demo
+
+        if (allForbidden) {
+          const forbiddenAppsAllow = apps.filter(app => rules.filter(rule => rule.mode == 'a' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
+          if (forbiddenAppsAllow.length > 0) {
+            return forbiddenAppsAllow
+          }
           return [];
+        }
 
         const forbiddenApps = apps.filter(app => rules.filter(rule => rule.mode == 'f' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
         const allowedApps = apps.filter(app => !forbiddenApps.includes(app))
@@ -79,77 +98,86 @@ export class AppComponent extends SxcAppComponent {
           app.isSelected = isOptional ? false : true;
         });
 
-        allowedApps.sort((a, b) => a.displayName.localeCompare(b.displayName)) // Sotieren von A - Z
+        allowedApps.sort((a, b) => a.displayName.localeCompare(b.displayName)) // sorted apps von A - Z
 
         return allowedApps;
       })
     )
 
-
-    this.apps$ = appsFilteredByRules$.pipe(
-      combineLatestWith(this.isAllSelected, this.serachString), // abhänigkeit von apps$ ist das Mockup APPS und die selected
-      map(([apps, allSelected, serachString]) => {
-        const searchedApps = apps.filter((item: any) => {
-          return item.displayName.toLocaleLowerCase().includes(serachString.toLowerCase());
+    // alle gefilteren Apps wiedergeben
+    this.apps$ = this.appsFilteredByRules$.pipe(
+      combineLatestWith(this.isAllSelected, this.searchString, this.selectedApp), // dependence from apps$
+      map(([apps, allSelected, searchString, selectedApp]) => {
+        const searchedApps = apps.filter((item: Apps) => {
+          return item.displayName.toLocaleLowerCase().includes(searchString.toLowerCase());
         })
 
-        this.selectedAppsArr = []; // erstelle ein leeres Array
+        const appsToChangeSelection = searchString != "" ? searchedApps : apps;
 
-        apps.forEach(app => {
+        this.searchedAppsLenght = searchedApps.length
+
+        appsToChangeSelection.forEach(app => {
           app.isSelected = allSelected.forced ? allSelected.selected : app.isSelected;
-
-          if (app.isSelected) { // wenn app selectet ist
-            this.selectedAppsArr.push(app) // füge die app in das Arry hinzu wenn es ausgewählt wird
-          }
         });
 
-        return searchedApps; // gib die apps mit dem neuen status in die apps$ zurück auf die wir später zugreiffen
+        // number of insall selected apps
+        this.selectedApps = apps.filter(app => app.isSelected == true)
+        this.selectedAppCounter = this.selectedApps.length;
+
+        // number of unselected or selected
+        const selected = searchedApps.filter(app => app.isSelected == true)
+        this.unSelectedLength = selected.length;
+        this.selectedLength = searchedApps.length - this.unSelectedLength
+
+        if (this.selectedLength == 0) {
+          this.isSelectLenghtNull = true
+        } else {
+          this.isSelectLenghtNull = false
+        }
+
+        if (this.unSelectedLength == 0) {
+          this.isUnSelectLenghtNull = true
+        } else {
+          this.isUnSelectLenghtNull = false
+        }
+
+        return searchedApps; // return the apps with the new status to the apps$ we access late
       }),
-      delay(0), // lösst problem von change detection
       share(),
-      tap(() => {
-        this.selectedApps.next(this.selectedAppsArr); // füge das array in das behaviorsubjcet zu, so dass es verändernungen mit bekommt
-      })
     )
   }
 
-  toggleSelectedApp(event: any, app: Apps, urlKey: string) { // über gibt die app und die urlKey
-    const found = this.selectedAppsArr.some((app: Apps) => app.urlKey == urlKey); // finde die app, bei der die app.urlKey und urlkey gleich sind
 
+  toggleSelectedApp(event: any, app: Apps, urlKey: string) {
+    // selecte or unselect checkboxes
+    // mat-icon like a are not used for selct and should redirect to a link
     if (event.target.tagName == 'A' || event.target.tagName == 'MAT-ICON')
       return;
 
-    if (!found) {
-      app.isSelected = true;
-      this.selectedAppsArr.push(app) // pusht die neue app in das Array und es wir vergrössert
-    } else {
-      app.isSelected = false;
-      const indexOfApps = this.selectedAppsArr.findIndex((app: Apps) => { // wird benötigt um den index herauszufinden
-        return app.urlKey === urlKey; // finde die app, bei der die app.urlKey und die urlKey übereinander stimmt
-      });
+    this.isAllSelected.next({ selected: true, forced: false })
 
-      this.selectedAppsArr.splice(indexOfApps, 1); // objekt wir an stelle Index aus dem arry entfernt
-    }
-
-    this.selectedApps.next(this.selectedAppsArr) // füge das array in das behaviorsubjcet zu, so dass es verändernungen mit bekommt
-
+    app.isSelected = !app.isSelected
+    this.selectedApp.next(app) // behavior pass an app with isSelected status
   }
 
   postAppsToInstall() {
-    const appsToInstall = this.selectedAppsArr.map(data => {
+    // sends the selected apps with the displayNmae and url to the outer window
+    const appsToInstall = this.selectedApps.map(data => {
       return { displayName: data.displayName, url: data.downloadUrl };
     });
 
-    var message = { 'action': 'install', 'moduleId': this.moduleId, 'packages': appsToInstall }; // werte die übergeben werden wie z.b. die ausgewählten Apps
-    window.parent.postMessage(JSON.stringify(message), '*'); // message wir an das übergeortente fenster weitergeben / der code wird mit Iframe eingebunden
+    var message = { 'action': 'install', 'moduleId': this.moduleId, 'packages': appsToInstall };
+    window.parent.postMessage(JSON.stringify(message), '*');
   }
 
   toggleAppSelection(val: boolean) {
-    this.isAllSelected.next({ selected: val, forced: true }); // der wert true oder false (val von html) wird an den observable übergeben, jenach dem werden sie alle checked / unchecked
+    // checkboxen state true or false
+    this.isAllSelected.next({ selected: val, forced: true });
   }
 
   toggleView(mode: string) {
-    this.isTilesView = mode == "tiles" ? true : false; // wenn es true ist, wird es beim klicken false und umgekehrt
+    // List or tiles view switchen
+    this.isTilesView = mode == "tiles" ? true : false;
   }
 }
 

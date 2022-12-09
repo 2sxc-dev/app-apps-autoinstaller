@@ -6,29 +6,38 @@
   <div class="row mb-2">
     <div class="col-12 mt-3">
       <!-- Header -->
-      <h2>Let's auto-install some popular apps (live)</h2>
-      <p class="mb-3">Don't worry: if you don't like one, you can remove it later without side-effects :) Our best pick
-        for you is: Auto install apps for 2sxc 12.05</p>
+      <h2>Let's auto-install some popular apps</h2>
+      <p class="mb-3">
+        Don't worry: if you don't like one, you can remove it later without
+        side-effects :) Our best pick for you is: Auto install apps for 2sxc
+        12.05
+      </p>
     </div>
   </div>
 
   <!-- Buttons-->
-  <div class="d-flex flex-column flex-lg-row mb-3 w-100 ">
+  <div class="d-flex flex-column flex-lg-row mb-3 w-100">
     <div class="mb-2">
       <!-- Download Button -->
-      <button [disabled]="(selectedApps | async).length == 0" type="button" class="btn btn-darkblue text-nowrap w-100" (click)="postAppsToInstall()">
-        <span>Install selected {{(selectedApps | async).length}} apps</span>
+      <button [disabled]="selectedAppCounter == 0" type="button" class="btn btn-darkblue text-nowrap w-100"
+        (click)="postAppsToInstall()">
+        <span>Install selected {{ selectedAppCounter }} apps</span>
       </button>
     </div>
     <!-- Selected Buttons -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <button type="button" class="btn btn-secondary btn-select-toggle" (click)="toggleAppSelection(false)">Unselect All</button>
-      <button type="button" class="btn btn-secondary btn-select-toggle ms-3" (click)="toggleAppSelection(true)">Select All</button>
-
+      <button type="button" class="btn btn-secondary btn-select-toggle" [disabled]="isUnSelectLenghtNull"
+        (click)="toggleAppSelection(false)">
+        Unselect {{ unSelectedLength }}
+      </button>
+      <button type="button" class="btn btn-secondary btn-select-toggle ms-3" [disabled]="isSelectLenghtNull"
+        (click)="toggleAppSelection(true)">
+        Select {{ selectedLength }}
+      </button>
     </div>
     <!-- Search  -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <input class="form-control" [formControl]="searchForm" type="search" placeholder="Search...">
+      <input class="form-control" [formControl]="searchForm" type="search" placeholder="Search..." />
     </div>
     <!-- View Button -->
     <div class="view-toggle ms-auto">
@@ -39,8 +48,14 @@
 
   <p>In case you're wondering, we'll install the following apps:</p>
 
-  <div *ngIf="(apps$ | async)?.length == 0" class="alert alert-danger" role="alert">
-    ERROR: There is no app for this version
+  <div *ngIf="(appsFilteredByRules$ | async)?.length == 0" class="alert alert-danger" role="alert">
+    ERROR: There is no app for this version.
+  </div>
+
+  <div *ngIf="
+      (appsFilteredByRules$ | async)?.length > 0 && searchedAppsLenght == 0
+    " class="alert alert-warning" role="alert">
+    No app found, check the search criteria.
   </div>
 
   <!-- Alle Apps -->
@@ -48,22 +63,30 @@
     <!-- Tiles view -->
     <div *ngIf="isTilesView" class="row mb-2">
       <ng-container *ngFor="let app of apps">
-        <div class="col-12 col-sm-3 col-xxl-2 mb-3 app-view-tiles">
-          <div class="h-100 card-grid card bg-light">
+        <div class="col-12 col-sm-4 col-md-4 col-lg-3 col-xxl-2 mb-3 app-view-tiles">
+          <div class="card bg-light">
             <div class="row g-0 position-relative app-view-item" (click)="toggleSelectedApp($event, app, app.urlKey)">
-              <div class="col-md-4 d-flex align-items-center">
-                <img src="https://2sxc.org/{{app.icon}}?w=800" class="img-fluid rounded-start align-items-center"
-                  alt="...">
+              <div class="col-md-4">
+                <img src="https://2sxc.org/{{ app.icon }}?w=800" class="img-fluid rounded-start align-items-center"
+                  alt="{{ app.displayName }}" />
               </div>
               <div class="col-md-8">
-                <div class="card-body px-xxl-3 py-3 py-md-0 h-100 d-flex flex-column justify-content-center">
-                  <h5 class="fs-6 card-title mb-1"><a target="_blank"
-                      href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
+                <div class="card-body py-3 py-md-0 d-flex flex-column h-100 justify-content-center">
+                  <div>
+                    <a class="title-hover vertical-middle mb-1" target="_blank"
+                      href="https://2sxc.org/apps/app/{{ app.urlKey }}">
+                      <h5 class="fs-6 card-title mb-0">
+                        {{ app.displayName }}
+                      </h5>
+                      <mat-icon class="arrow-icon">north_east</mat-icon>
+                    </a>
+                  </div>
                   <div class="card-text">
-                    <a class="version-link" href="{{app.gitHub}}" target="_blank"><mat-icon>folder_zip</mat-icon></a>
-
+                    <a class="version-link version-hover" href="{{ app.gitHubRelease }}" target="_blank">
+                      {{ app.version
+                      }}<mat-icon class="zip-icon">folder_zip</mat-icon></a>
                     <input class="checkbox-item check-size" type="checkbox" [(ngModel)]="app.isSelected"
-                      [(value)]="app.urlKey">
+                      [(value)]="app.urlKey" />
                   </div>
                 </div>
               </div>
@@ -71,37 +94,42 @@
           </div>
         </div>
       </ng-container>
-
     </div>
 
     <!-- List view -->
     <div *ngIf="!isTilesView">
-      <div *ngFor="let app of apps " class="d-flex align-items-center p-2 app-view-list w-100"
+      <div *ngFor="let app of apps" class="d-flex align-items-center p-2 mb-3 app-view-list w-100"
         (click)="toggleSelectedApp($event, app, app.urlKey)">
-
-        <div class="d-flex align-items-center ">
-          <img src="https://2sxc.org/{{app.icon}}?w=50" class="img-fluid rounded-start align-items-center" alt="...">
+        <div class="d-flex align-items-center">
+          <img src="https://2sxc.org/{{ app.icon }}?w=50" class="img-fluid rounded-start align-items-center min-w-50"
+            alt="{{ app.displayName }}" />
         </div>
-        <div class="ms-3 w-50 w-md-100 ">
-          <h5 class="fs-6 mb-0"><a target="_blank"
-              href="https://2sxc.org/apps/app/{{app.urlKey}}">{{app.displayName}}</a></h5>
-          <a class="version-link" href="{{app.gitHub}}" target="_blank"><mat-icon>folder_zip</mat-icon></a>
+        <div class="d-flex flex-column ps-3 app-view-list-item">
+          <div>
+            <a target="_blank" href="https://2sxc.org/apps/app/{{ app.urlKey }}" class="title-hover align-middle mb-1">
+              <h5 class="fs-6 mb-0">{{ app.displayName }}</h5>
+              <mat-icon class="arrow-icon">north_east</mat-icon>
+            </a>
+          </div>
+          <div>
+            <a class="version-link version-hover position-relative" href="{{ app.gitHub }}" target="_blank">{{
+              app.version
+              }}<mat-icon class="zip-icon">folder_zip</mat-icon></a>
+          </div>
         </div>
-
         <div class="ms-auto">
-          <input class="check-size" type="checkbox" [(ngModel)]="app.isSelected" [(value)]="app.urlKey">
+          <input class="check-size" type="checkbox" [(ngModel)]="app.isSelected" [(value)]="app.urlKey" />
         </div>
-
       </div>
-
     </div>
   </ng-container>
 
   <div class="row">
     <p>
-      This dialog will disappear when you've added or created your first app. It will appear again on every new portal,
-      as the apps are per portal. If you want to add more apps later on, just get them from the <a
-        href="https://2sxc.org/apps" target="_blank">app catalog</a>
+      This dialog will disappear when you've added or created your first app. It
+      will appear again on every new portal, as the apps are per portal. If you
+      want to add more apps later on, just get them from the
+      <a href="https://2sxc.org/apps" target="_blank">app catalog</a>
     </p>
   </div>
 </div>
