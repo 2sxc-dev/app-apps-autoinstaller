@@ -48,7 +48,7 @@ export class AppComponent extends SxcAppComponent {
       const messageDate = JSON.parse(event.data);
 
       if (messageDate.action == 'specs' && messageDate.data != undefined) {
-        this.rules.next(messageDate.data.rules);
+        this.rules.next(messageDate.data.rules || []);
       }
     }
   }
