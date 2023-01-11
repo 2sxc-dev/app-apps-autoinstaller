@@ -1,20 +1,19 @@
-import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
-import { HttpClientModule } from "@angular/common/http";
 import { ContentManagerModule, SxcRootModule } from '@2sic.com/sxc-angular';
-import { AppComponent } from "./app.component";
-import { FormsModule } from '@angular/forms';
+import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatIconModule} from '@angular/material/icon';
-import { SearchPipe } from './search.pipe';
+import { HttpClientModule } from "@angular/common/http";
+import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import {MatIconModule} from '@angular/material/icon';
+import { AppComponent } from "./app.component";
+
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
-      SearchPipe
    ],
   imports: [
     BrowserModule,

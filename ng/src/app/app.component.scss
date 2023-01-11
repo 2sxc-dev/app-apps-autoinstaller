@@ -51,7 +51,6 @@ $darkblue: #022f5a;
     font-size: 20px;
 
   }
-
 }
 
 // app-view-list
@@ -85,7 +84,6 @@ $darkblue: #022f5a;
     height: 20px;
     font-size: 20px;
   }
-
 }
 
 .btn-darkblue {
@@ -96,7 +94,6 @@ $darkblue: #022f5a;
     background-color: lighten($darkblue, 5);
     color: white;
   }
-
 }
 
 // general  classes
@@ -168,7 +165,6 @@ input {
     cursor: pointer;
   }
 }
-
 
 @include media-breakpoint-down(lg) {
   .btn-select-toggle {

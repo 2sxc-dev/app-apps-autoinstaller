@@ -1,6 +1,6 @@
 export interface Apps {
   downloadUrl: string;
-  url?: string;
+  url: string;
   displayName: string;
   icon: string;
   version?: string;

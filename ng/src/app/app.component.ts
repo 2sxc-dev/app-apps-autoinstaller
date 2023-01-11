@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
 import { Apps, Rules } from './app-interface';
-import { BehaviorSubject, combineLatestWith, debounceTime, delay, map, Observable, share, tap } from 'rxjs';
+import { BehaviorSubject, combineLatestWith, debounceTime, map, Observable, share, } from 'rxjs';
 import { DataService } from './services/data.service';
 import { FormControl } from '@angular/forms';
 
@@ -22,9 +22,7 @@ export class AppComponent extends SxcAppComponent {
 
   searchedAppsLenght: number;
   selectedLength: number;
-  isSelectLenghtNull: boolean
   unSelectedLength: number;
-  isUnSelectLenghtNull: boolean
   selectedApp!: BehaviorSubject<Apps>;
   selectedAppCounter: number;
   selectedApps: Apps[];
@@ -54,6 +52,7 @@ export class AppComponent extends SxcAppComponent {
   }
 
   ngOnInit(): void {
+
     // send a specs message from the Ifram to the outer window
     var message = { 'action': 'specs', 'moduleId': this.moduleId };
     window.parent.postMessage(JSON.stringify(message), '*');
@@ -66,7 +65,7 @@ export class AppComponent extends SxcAppComponent {
     this.selectedApp = new BehaviorSubject(<Apps>{});
 
     this.searchForm.valueChanges.pipe(
-      debounceTime(0) // 300-400 ms
+      debounceTime(300)
     ).subscribe(value => {
       this.isAllSelected.next({ selected: true, forced: false });
       this.searchString.next(value)
@@ -77,10 +76,6 @@ export class AppComponent extends SxcAppComponent {
       combineLatestWith(this.rules),
       map(([apps, rules]) => {
         var allForbidden = rules.filter(rule => rule.mode == 'f' && rule.target == 'all').length >= 1;
-
-        //Demo
-        // allForbidden = false; // zum testen
-        //Demo
 
         if (allForbidden) {
           const forbiddenAppsAllow = apps.filter(app => rules.filter(rule => rule.mode == 'a' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
@@ -129,18 +124,6 @@ export class AppComponent extends SxcAppComponent {
         this.unSelectedLength = selected.length;
         this.selectedLength = searchedApps.length - this.unSelectedLength
 
-        if (this.selectedLength == 0) {
-          this.isSelectLenghtNull = true
-        } else {
-          this.isSelectLenghtNull = false
-        }
-
-        if (this.unSelectedLength == 0) {
-          this.isUnSelectLenghtNull = true
-        } else {
-          this.isUnSelectLenghtNull = false
-        }
-
         return searchedApps; // return the apps with the new status to the apps$ we access late
       }),
       share(),
@@ -148,9 +131,9 @@ export class AppComponent extends SxcAppComponent {
   }
 
 
-  toggleSelectedApp(event: any, app: Apps, urlKey: string) {
+  toggleSelectedApp(event: any, app: Apps) {
     // selecte or unselect checkboxes
-    // mat-icon like a are not used for selct and should redirect to a link
+    // mat-icon like a are not used for select and should redirect to a link
     if (event.target.tagName == 'A' || event.target.tagName == 'MAT-ICON')
       return;
 

@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { share, tap } from 'rxjs';
-
-
+import { share } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
