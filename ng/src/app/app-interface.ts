@@ -20,3 +20,8 @@ export interface Rules {
   target: string;
   url: string;
 }
+
+export interface Selected {
+  selected: boolean,
+  forced: boolean
+}

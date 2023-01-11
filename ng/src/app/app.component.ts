@@ -1,9 +1,18 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
-import { Apps, Rules } from './app-interface';
+import { Apps, Rules, Selected } from './app-interface';
 import { BehaviorSubject, combineLatestWith, debounceTime, map, Observable, share, } from 'rxjs';
 import { DataService } from './services/data.service';
 import { FormControl } from '@angular/forms';
+import { environment } from '../environments/environment';
+
+
+// LINK: https://2sxc.org/apps/auto-install-15?ModuleId=1199&2SexyContentVersion=13.11.00&platform=Dnn&sysversion=9.1.1&sxcversion=13.01.03
+
+enum ViewModes {
+  Tiles = 'tiles',
+  List = 'list'
+}
 
 @Component({
   selector: 'app-root',
@@ -11,26 +20,23 @@ import { FormControl } from '@angular/forms';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent extends SxcAppComponent {
-  constructor(el: ElementRef, context: Context, private dataService: DataService) {
-    super(el, context);
-  }
+  baseUrl: string = environment.baseUrl;
 
   appsFilteredByRules$!: Observable<Apps[]>; //all apps from the service
-  rules!: BehaviorSubject<Rules[]>; // rules from 2sxc
   apps$!: Observable<Apps[]>; //all apps filtered by rules
+  rules!: BehaviorSubject<Rules[]>; // rules from 2sxc
   searchString!: BehaviorSubject<string>;
-
-  searchedAppsLenght: number;
-  selectedLength: number;
-  unSelectedLength: number;
+  isAllSelected!: BehaviorSubject<Selected>; // observable to select / deselect with true or false of the selecte box
   selectedApp!: BehaviorSubject<Apps>;
-  selectedAppCounter: number;
-  selectedApps: Apps[];
 
-  isAllSelected!: BehaviorSubject<any>; // observable to select / deselect with true or false of the selecte box
-  isTilesView: boolean = true; // view from tile to list depending on which other classes are shown, at start tile
+  selectedApps: Apps[]; // array for PostMessage
 
   searchForm = new FormControl();
+
+  appToSelectLength: number;
+  appsToUnselectLength: number;
+  viewModes = ViewModes;
+  currentMode: string = ViewModes.Tiles;
 
   // URL PARAMETERS
   params = new URLSearchParams(window.location.search);
@@ -39,6 +45,10 @@ export class AppComponent extends SxcAppComponent {
   sexyContentVersion = this.params.get("2SexyContentVersion");
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
+
+  constructor(el: ElementRef, context: Context, private dataService: DataService) {
+    super(el, context);
+  }
 
   // Message received from the outer window
   @HostListener('window:message', ['$event']) onPostMessage(event) {
@@ -52,7 +62,6 @@ export class AppComponent extends SxcAppComponent {
   }
 
   ngOnInit(): void {
-
     // send a specs message from the Ifram to the outer window
     var message = { 'action': 'specs', 'moduleId': this.moduleId };
     window.parent.postMessage(JSON.stringify(message), '*');
@@ -72,15 +81,15 @@ export class AppComponent extends SxcAppComponent {
     })
 
     // filter data from the service according to the rules
-    this.appsFilteredByRules$ = this.dataService.getApp(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId).pipe(
+    this.appsFilteredByRules$ = this.dataService.getApps(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId).pipe(
       combineLatestWith(this.rules),
       map(([apps, rules]) => {
         var allForbidden = rules.filter(rule => rule.mode == 'f' && rule.target == 'all').length >= 1;
 
         if (allForbidden) {
-          const forbiddenAppsAllow = apps.filter(app => rules.filter(rule => rule.mode == 'a' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
-          if (forbiddenAppsAllow.length > 0) {
-            return forbiddenAppsAllow
+          const appsAllowedByRules = apps.filter(app => rules.filter(rule => rule.mode == 'a' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
+          if (appsAllowedByRules.length > 0) {
+            return appsAllowedByRules
           }
           return [];
         }
@@ -109,20 +118,17 @@ export class AppComponent extends SxcAppComponent {
 
         const appsToChangeSelection = searchString != "" ? searchedApps : apps;
 
-        this.searchedAppsLenght = searchedApps.length
-
         appsToChangeSelection.forEach(app => {
           app.isSelected = allSelected.forced ? allSelected.selected : app.isSelected;
         });
 
-        // number of insall selected apps
-        this.selectedApps = apps.filter(app => app.isSelected == true)
-        this.selectedAppCounter = this.selectedApps.length;
+        // number of selected apps to install
+        this.selectedApps = apps.filter(app => app.isSelected == true) || [];
 
         // number of unselected or selected
-        const selected = searchedApps.filter(app => app.isSelected == true)
-        this.unSelectedLength = selected.length;
-        this.selectedLength = searchedApps.length - this.unSelectedLength
+        const selected = searchedApps.filter(app => app.isSelected == true);
+        this.appsToUnselectLength = selected.length;
+        this.appToSelectLength = searchedApps.length - this.appsToUnselectLength;
 
         return searchedApps; // return the apps with the new status to the apps$ we access late
       }),
@@ -160,7 +166,7 @@ export class AppComponent extends SxcAppComponent {
 
   toggleView(mode: string) {
     // List or tiles view switchen
-    this.isTilesView = mode == "tiles" ? true : false;
+    this.currentMode = mode;
   }
 }
 
