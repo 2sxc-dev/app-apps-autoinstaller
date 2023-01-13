@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener } from '@angular/core';
 import { SxcAppComponent, Context } from '@2sic.com/sxc-angular';
-import { Apps, Rules, Selected } from './app-interface';
+import { App, Rules, Selected } from './app-interface';
 import { BehaviorSubject, combineLatestWith, debounceTime, map, Observable, share, } from 'rxjs';
 import { DataService } from './services/data.service';
 import { FormControl } from '@angular/forms';
@@ -22,14 +22,14 @@ enum ViewModes {
 export class AppComponent extends SxcAppComponent {
   baseUrl: string = environment.baseUrl;
 
-  appsFilteredByRules$!: Observable<Apps[]>; //all apps from the service
-  apps$!: Observable<Apps[]>; //all apps filtered by rules
-  rules!: BehaviorSubject<Rules[]>; // rules from 2sxc
-  searchString!: BehaviorSubject<string>;
-  isAllSelected!: BehaviorSubject<Selected>; // observable to select / deselect with true or false of the selecte box
-  selectedApp!: BehaviorSubject<Apps>;
+  appsFilteredByRules$!: Observable<App[]>; //all apps from the service
+  apps$!: Observable<App[]>; //all apps filtered by rules
+  sxcRules = new BehaviorSubject<Rules[]>([]);
+  searchString = new BehaviorSubject<string>("");
+  isAllSelected = new BehaviorSubject<Selected>({ selected: true, forced: false })  // observable to select / deselect with true or false of the selecte box
+  selectedApp = new BehaviorSubject(<App>{})
 
-  selectedApps: Apps[]; // array for PostMessage
+  selectedApps: App[]; // array for PostMessage
 
   searchForm = new FormControl();
 
@@ -56,22 +56,18 @@ export class AppComponent extends SxcAppComponent {
       const messageDate = JSON.parse(event.data);
 
       if (messageDate.action == 'specs' && messageDate.data != undefined) {
-        this.rules.next(messageDate.data.rules || []);
+        this.sxcRules.next(messageDate.data.rules || []);
       }
     }
   }
 
   ngOnInit(): void {
+
     // send a specs message from the Ifram to the outer window
     var message = { 'action': 'specs', 'moduleId': this.moduleId };
     window.parent.postMessage(JSON.stringify(message), '*');
 
     this.hasUrlParams = this.params.has("sysversion") && this.params.has("sxcversion") && this.params.has("2SexyContentVersion");
-
-    this.isAllSelected = new BehaviorSubject({ selected: true, forced: false }); // Select all Checkbox
-    this.rules = new BehaviorSubject<Rules[]>([]);
-    this.searchString = new BehaviorSubject('');
-    this.selectedApp = new BehaviorSubject(<Apps>{});
 
     this.searchForm.valueChanges.pipe(
       debounceTime(300)
@@ -80,25 +76,25 @@ export class AppComponent extends SxcAppComponent {
       this.searchString.next(value)
     })
 
-    // filter data from the service according to the rules
+    // filter data from the service to the rules
     this.appsFilteredByRules$ = this.dataService.getApps(this.sxcVersion, this.sysversion, this.sexyContentVersion, this.moduleId).pipe(
-      combineLatestWith(this.rules),
-      map(([apps, rules]) => {
-        var allForbidden = rules.filter(rule => rule.mode == 'f' && rule.target == 'all').length >= 1;
+      combineLatestWith(this.sxcRules),
+      map(([apps, sxcrules]) => {
+        var allForbidden = sxcrules.filter(rule => rule.mode == 'f' && rule.target == 'all').length >= 1;
 
         if (allForbidden) {
-          const appsAllowedByRules = apps.filter(app => rules.filter(rule => rule.mode == 'a' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
-          if (appsAllowedByRules.length > 0) {
-            return appsAllowedByRules
+          const appsAllowedBySxcRules = apps.filter(app => sxcrules.filter(rule => rule.mode == 'a' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
+          if (appsAllowedBySxcRules.length > 0) {
+            return appsAllowedBySxcRules
           }
           return [];
         }
 
-        const forbiddenApps = apps.filter(app => rules.filter(rule => rule.mode == 'f' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
+        const forbiddenApps = apps.filter(app => sxcrules.filter(rule => rule.mode == 'f' && rule.target == 'guid' && rule.appGuid == app.guid).length > 0);
         const allowedApps = apps.filter(app => !forbiddenApps.includes(app))
 
         allowedApps.forEach(app => {
-          const isOptional = rules.filter(rule => rule.mode == 'o' && rule.target == 'guid' && rule.appGuid == app.guid).length == 1;
+          const isOptional = sxcrules.filter(rule => rule.mode == 'o' && rule.target == 'guid' && rule.appGuid == app.guid).length == 1;
           app.isSelected = isOptional ? false : true;
         });
 
@@ -108,11 +104,11 @@ export class AppComponent extends SxcAppComponent {
       })
     )
 
-    // alle gefilteren Apps wiedergeben
+    // all Apps
     this.apps$ = this.appsFilteredByRules$.pipe(
       combineLatestWith(this.isAllSelected, this.searchString, this.selectedApp), // dependence from apps$
       map(([apps, allSelected, searchString, selectedApp]) => {
-        const searchedApps = apps.filter((item: Apps) => {
+        const searchedApps = apps.filter((item: App) => {
           return item.displayName.toLocaleLowerCase().includes(searchString.toLowerCase());
         })
 
@@ -136,11 +132,10 @@ export class AppComponent extends SxcAppComponent {
     )
   }
 
-
-  toggleSelectedApp(event: any, app: Apps) {
-    // selecte or unselect checkboxes
+  // select or unselect checkboxes
+  onAppClickEvent(tagName: string, app: App) {
     // mat-icon like a are not used for select and should redirect to a link
-    if (event.target.tagName == 'A' || event.target.tagName == 'MAT-ICON')
+    if (tagName == 'A' || tagName == 'MAT-ICON')
       return;
 
     this.isAllSelected.next({ selected: true, forced: false })
@@ -149,8 +144,8 @@ export class AppComponent extends SxcAppComponent {
     this.selectedApp.next(app) // behavior pass an app with isSelected status
   }
 
+  // sends the selected apps with the displayNmae and url to the outer window
   postAppsToInstall() {
-    // sends the selected apps with the displayNmae and url to the outer window
     const appsToInstall = this.selectedApps.map(data => {
       return { displayName: data.displayName, url: data.downloadUrl };
     });
@@ -159,13 +154,13 @@ export class AppComponent extends SxcAppComponent {
     window.parent.postMessage(JSON.stringify(message), '*');
   }
 
+  // checkboxen state true or false
   toggleAppSelection(val: boolean) {
-    // checkboxen state true or false
     this.isAllSelected.next({ selected: val, forced: true });
   }
 
-  toggleView(mode: string) {
-    // List or tiles view switchen
+  // List or tiles view switchen
+  changeView(mode: string) {
     this.currentMode = mode;
   }
 }

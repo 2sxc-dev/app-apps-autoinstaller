@@ -1,4 +1,4 @@
-export interface Apps {
+export interface App {
   downloadUrl: string;
   url: string;
   displayName: string;

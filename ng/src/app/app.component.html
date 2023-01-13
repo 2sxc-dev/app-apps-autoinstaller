@@ -5,7 +5,7 @@
 <div *ngIf="hasUrlParams" class="container-fluid">
   <div class="row mb-2">
     <div class="col-12 mt-3">
-      <!-- Header -->
+      <!-- Intro -->
       <h2>Let's auto-install some popular apps</h2>
       <p class="mb-3">
         Don't worry: if you don't like one, you can remove it later without
@@ -39,8 +39,8 @@
     </div>
     <!-- Button tiles or list View -->
     <div class="view-toggle ms-auto">
-      <mat-icon (click)="toggleView(viewModes.Tiles)" class="me-3">grid_on</mat-icon>
-      <mat-icon (click)="toggleView(viewModes.List)" class="me-3">list</mat-icon>
+      <mat-icon (click)="changeView(viewModes.Tiles)" class="me-3">grid_on</mat-icon>
+      <mat-icon (click)="changeView(viewModes.List)" class="me-3">list</mat-icon>
     </div>
   </div>
 
@@ -63,7 +63,7 @@
       <ng-container *ngFor="let app of apps">
         <div class="col-12 col-sm-4 col-md-4 col-lg-3 col-xxl-2 mb-3 app-view-tiles">
           <div class="card bg-light">
-            <div class="row g-0 position-relative app-view-item" (click)="toggleSelectedApp($event, app)">
+            <div class="row g-0 position-relative app-view-item" (click)="onAppClickEvent($event.target.tagName, app)">
               <div class="col-md-4">
                 <img src="{{baseUrl}}/{{ app.icon }}?w=800" class="img-fluid rounded-start align-items-center"
                   alt="{{ app.displayName }}" />
@@ -95,7 +95,7 @@
     <!-- List view -->
     <div *ngIf="currentMode == viewModes.List">
       <div *ngFor="let app of apps" class="d-flex align-items-center p-2 mb-3 app-view-list w-100"
-        (click)="toggleSelectedApp($event, app)">
+        (click)="onAppClickEvent($event, app)">
         <div class="d-flex align-items-center">
           <img src="{{baseUrl}}/{{ app.icon }}?w=50" class="img-fluid rounded-start align-items-center min-w-50"
             alt="{{ app.displayName }}" />
@@ -119,7 +119,7 @@
     </div>
   </ng-container>
 
-  <!-- Footer  -->
+  <!-- Outro  -->
   <div class="row">
     <p>
       This dialog will disappear when you've added or created your first app. It
