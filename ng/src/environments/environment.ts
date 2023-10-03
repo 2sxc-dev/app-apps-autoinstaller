@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseUrl: "https://2sxc.org"
+  baseUrl: "https://2sxc.org",
 };
 
 /*

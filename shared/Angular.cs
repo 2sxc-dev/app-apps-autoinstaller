@@ -2,7 +2,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Helpers;
 using ToSic.Razor.Blade;
-public class Angular: Custom.Hybrid.Code12 {
+public class Angular : Custom.Hybrid.Code12
+{
   // -------------------------------------------------------------------------------------
   // These helpers are used by the CSHTML code which loads the angular app.
   // They do a bunch of things, like switching between testing/live code and more.
@@ -13,19 +14,23 @@ public class Angular: Custom.Hybrid.Code12 {
   private const string DefaultAppTag = "app-root";  // Angular app tag if not set
   private const string LocalDevServer = "//localhost:4200"; // default localhost dev-server using angular  
 
-  
+
   // ------------------------------ Get from Generated HTML ------------------------------
   // load the Angular generated html file and keep only the important parts
-  public string ImportAngularHtml(string edition, string appName = DefaultAppName, string appTag = DefaultAppTag) {
+  public string ImportAngularHtml(string edition, string appName = DefaultAppName, string appTag = DefaultAppTag)
+  {
     // 1. build the path to where the angular app is stored
     var resourcesPath = App.Path + "/" + edition + "/dist/" + appName;
     var indexFile = App.PhysicalPath + @"\" + edition + @"\dist\" + appName + @"\index.html";
     string html_orig;
 
     // 2. Read body contents from index.html
-    try {
+    try
+    {
       html_orig = System.IO.File.ReadAllText(indexFile);
-    } catch {
+    }
+    catch
+    {
       return "Error trying to access '" + indexFile + "' - it probably doesn't exist";
     }
 
@@ -47,9 +52,10 @@ public class Angular: Custom.Hybrid.Code12 {
 
   // --------------------------------   Get from ng serve   -------------------------------
   // This returns the tag needed to hot-load the angular app 
-  public dynamic GetLocalDevTag(string edition = "local", string appTag = DefaultAppTag, string localDevServer = LocalDevServer) {
-    return "<" + appTag + AppAttributes(edition, LocalDevServer + "/") + ">" 
-      + "This loads all scripts from " + localDevServer + " using the same protocol (http/https) as the current site uses. " 
+  public dynamic GetLocalDevTag(string edition = "local", string appTag = DefaultAppTag, string localDevServer = LocalDevServer)
+  {
+    return "<" + appTag + AppAttributes(edition, LocalDevServer + "/") + ">"
+      + "This loads all scripts from " + localDevServer + " using the same protocol (http/https) as the current site uses. "
       + "If you see this message, your local dev is either not running, or the configuration is wrong. <br>"
       + "It should be running on localhost:4200 and use the same protocol as this website. <br><br>"
       + "To make sure you're doing things right, please follow <a href='https://azing.org/2sxc/r/oCmPBI3p' target='_blank'>these instructions</a>. <br>"
@@ -59,13 +65,15 @@ public class Angular: Custom.Hybrid.Code12 {
       + "</" + appTag + ">";
   }
 
-  public string GetLocalDevServer() {
+  public string GetLocalDevServer()
+  {
     return LocalDevServer;
   }
 
   // ------------------------------- Private Functions ------------------------------
-  private string AppAttributes(string currentEdition, string distPath) {
-    return " " + Tag.Attr("edition", currentEdition) 
+  private string AppAttributes(string currentEdition, string distPath)
+  {
+    return " " + Tag.Attr("edition", currentEdition)
       + " " + Tag.Attr("api-edition", currentEdition)
       + (Text.Has(distPath) ? " " + Tag.Attr("angular-path", distPath) : "");
   }
