@@ -15,6 +15,9 @@ import { environment } from "../environments/environment";
 
 // LINK: https://2sxc.org/apps/auto-install-15?ModuleId=1199&2SexyContentVersion=13.11.00&platform=Dnn&sysversion=9.1.1&sxcversion=13.01.03
 
+// app runs on 2sxc.org under apps on the auto install page.
+// Npm local-ssl and localhost:4200
+
 enum ViewModes {
   Tiles = "tiles",
   List = "list",
@@ -67,6 +70,8 @@ export class AppComponent extends SxcAppComponent {
   @HostListener("window:message", ["$event"]) onPostMessage(event) {
     if (typeof event.data == "string") {
       const messageDate = JSON.parse(event.data);
+      // TODO:: Message from the outer window (Install Apps)
+      console.log(event.data);
 
       if (messageDate.action == "specs" && messageDate.data != undefined) {
         this.sxcRules.next(messageDate.data.rules || []);
@@ -100,15 +105,17 @@ export class AppComponent extends SxcAppComponent {
       .pipe(
         combineLatestWith(this.sxcRules),
         map(([apps, sxcrules]) => {
+          // check if all apps are forbidden
           var allForbidden =
-            sxcrules.filter((rule) => rule.mode == "f" && rule.target == "all")
+            sxcrules.filter((rule: Rules) => rule.mode == "f" && rule.target == "all")
               .length >= 1;
 
+            // if all apps are forbidden, only the apps that are allowed (whitelisten) by the rules are displayed
           if (allForbidden) {
             const appsAllowedBySxcRules = apps.filter(
               (app) =>
                 sxcrules.filter(
-                  (rule) =>
+                  (rule: Rules) =>
                     rule.mode == "a" &&
                     rule.target == "guid" &&
                     rule.appGuid == app.guid
@@ -119,11 +126,11 @@ export class AppComponent extends SxcAppComponent {
             }
             return [];
           }
-
+          // if all apps are allowed, only the apps that are forbidden (blacklisten) by the rules are displayed
           const forbiddenApps = apps.filter(
             (app) =>
               sxcrules.filter(
-                (rule) =>
+                (rule: Rules) =>
                   rule.mode == "f" &&
                   rule.target == "guid" &&
                   rule.appGuid == app.guid
@@ -133,10 +140,11 @@ export class AppComponent extends SxcAppComponent {
             (app) => !forbiddenApps.includes(app)
           );
 
+          // if the app is optional, the checkbox is not selected
           allowedApps.forEach((app) => {
             const isOptional =
               sxcrules.filter(
-                (rule) =>
+                (rule: Rules) =>
                   rule.mode == "o" &&
                   rule.target == "guid" &&
                   rule.appGuid == app.guid

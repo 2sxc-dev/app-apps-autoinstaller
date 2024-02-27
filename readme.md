@@ -1,5 +1,6 @@
 <img src="app-icon.png" width="300px" align="right">
 
+
 # App Template for Angular 14 Best Practices with DNN and 2sxc
 
 ## What is this?
