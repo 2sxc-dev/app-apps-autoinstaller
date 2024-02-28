@@ -58,6 +58,8 @@ export class AppComponent extends SxcAppComponent {
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
 
+  recommendedAppsTitle: string = "Recommended Apps for";
+
   constructor(
     el: ElementRef,
     context: Context,
@@ -105,6 +107,7 @@ export class AppComponent extends SxcAppComponent {
       .pipe(
         combineLatestWith(this.sxcRules),
         map(([apps, sxcrules]) => {
+          this.recommendedAppsTitle = apps[0].title;
           // check if all apps are forbidden
           var allForbidden =
             sxcrules.filter((rule: Rules) => rule.mode == "f" && rule.target == "all")
