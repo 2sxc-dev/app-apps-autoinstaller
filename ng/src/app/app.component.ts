@@ -71,7 +71,6 @@ export class AppComponent extends SxcAppComponent {
     if (typeof event.data == "string") {
       const messageDate = JSON.parse(event.data);
       // TODO:: Message from the outer window (Install Apps)
-      console.log(event.data);
 
       if (messageDate.action == "specs" && messageDate.data != undefined) {
         this.sxcRules.next(messageDate.data.rules || []);
@@ -80,6 +79,7 @@ export class AppComponent extends SxcAppComponent {
   }
 
   ngOnInit(): void {
+
     // send a specs message from the Ifram to the outer window
     var message = { action: "specs", moduleId: this.moduleId };
     window.parent.postMessage(JSON.stringify(message), "*");
