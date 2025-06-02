@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener } from "@angular/core";
+import { Component, ElementRef, HostListener, inject } from "@angular/core";
 import { SxcAppComponent, Context } from "@2sic.com/sxc-angular";
 import { App, Rules, Selected } from "./app-interface";
 import {
@@ -12,6 +12,7 @@ import {
 import { DataService } from "./services/data.service";
 import { FormControl } from "@angular/forms";
 import { environment } from "../environments/environment";
+import { ActivatedRoute } from "@angular/router";
 
 // LINK: https://2sxc.org/apps/auto-install-15?ModuleId=1199&2SexyContentVersion=13.11.00&platform=Dnn&sysversion=9.1.1&sxcversion=13.01.03
 
@@ -29,6 +30,8 @@ enum ViewModes {
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent extends SxcAppComponent {
+
+
   baseUrl: string = environment.baseUrl;
 
   appsFilteredByRules$!: Observable<App[]>; //all apps from the service
@@ -57,6 +60,7 @@ export class AppComponent extends SxcAppComponent {
   sexyContentVersion = this.params.get("2SexyContentVersion");
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
+  isTemplateUrl = false;
 
   recommendedAppsTitle: string = "Recommended Apps for";
 
@@ -91,6 +95,8 @@ export class AppComponent extends SxcAppComponent {
       this.params.has("sxcversion") &&
       this.params.has("2SexyContentVersion");
 
+    this.isTemplateUrl = this.params.has("isTemplate");
+
     this.searchForm.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
       this.isAllSelected.next({ selected: true, forced: false });
       this.searchString.next(value);
@@ -113,7 +119,7 @@ export class AppComponent extends SxcAppComponent {
             sxcrules.filter((rule: Rules) => rule.mode == "f" && rule.target == "all")
               .length >= 1;
 
-            // if all apps are forbidden, only the apps that are allowed (whitelisten) by the rules are displayed
+          // if all apps are forbidden, only the apps that are allowed (whitelisten) by the rules are displayed
           if (allForbidden) {
             const appsAllowedBySxcRules = apps.filter(
               (app) =>
