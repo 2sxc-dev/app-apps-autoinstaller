@@ -13,7 +13,7 @@
       <app-header title="Let's auto-install some popular apps" description="Don't worry: if you don't like one, you can remove it later without
         side-effects :)" [strongText]="recommendedAppsTitle" />
       } @else if(isTemplateUrl) {
-      <app-header title="Let's install a Template App" description=" Don't worry: You cann remove unsued logic later"
+      <app-header title="Let's create a App with a Template" description=" Don't worry: You cann remove unsued logic later"
         strongText="Recommendes Template for:" />
       }
     </div>
@@ -53,7 +53,7 @@
   <!-- Warning, there are no apps found based on your search criteria -->
   @if ((appsFilteredByRules$ | async)?.length > 0 && (apps$ | async)?.length == 0) {
   <div class="alert alert-warning" role="alert">
-    No app found, check the search criteria.
+    No Data found, check the search criteria.
   </div>
   }
   <!-- Alle Apps  -->
