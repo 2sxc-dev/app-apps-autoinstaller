@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, inject } from "@angular/core";
+import { Component, ElementRef, HostListener } from "@angular/core";
 import { SxcAppComponent, Context } from "@2sic.com/sxc-angular";
 import { App, Rules, Selected } from "./app-interface";
 import {
@@ -12,7 +12,6 @@ import {
 import { DataService } from "./services/data.service";
 import { FormControl } from "@angular/forms";
 import { environment } from "../environments/environment";
-import { ActivatedRoute } from "@angular/router";
 
 // LINK: https://2sxc.org/apps/auto-install-15?ModuleId=1199&2SexyContentVersion=13.11.00&platform=Dnn&sysversion=9.1.1&sxcversion=13.01.03
 
