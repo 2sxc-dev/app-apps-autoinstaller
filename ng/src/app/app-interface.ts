@@ -5,6 +5,7 @@ export interface App {
   icon: string;
   version?: string;
   gitHub: string;
+  gitHubRelease?: string;
   urlKey: string;
   shortDescription: string;
   isSelected?: boolean;
