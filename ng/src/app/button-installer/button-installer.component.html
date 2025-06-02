@@ -1,21 +1,21 @@
-    <!-- <div class="d-flex">
-      INFO COMMENTS: Download Button
-      <div class="mb-2">
-        <button [disabled]="selectedApps?.length == 0" type="button" class="btn btn-darkblue text-nowrap"
-          (click)="postAppsToInstall()">
-          <span>Install selected {{ selectedApps?.length }} apps</span>
-        </button>
-      </div>
-      INFO COMMENTS: Unselect Button
-      <div class="ms-0 ms-lg-3 mb-2">
-        <button type="button" class="btn btn-secondary btn-select-toggle" [disabled]="appsToUnselectLength == 0"
-          (click)="toggleAppSelection(false)">
-          Unselect {{ appsToUnselectLength }}
-        </button>
-        INFO COMMENTS: Select Button
-        <button type="button" class="btn btn-secondary btn-select-toggle ms-3" [disabled]="appToSelectLength == 0"
-          (click)="toggleAppSelection(true)">
-          Select {{ appToSelectLength }}
-        </button>
-      </div>
-    </div> -->
+<div class="d-flex">
+  <!--  Download Button -->
+  <div class="mb-2">
+    <button [disabled]="selectedApps()?.length == 0" type="button" class="btn btn-darkblue text-nowrap"
+      (click)="onInstallClicked()">
+      <span>Install selected {{ selectedApps()?.length }} apps</span>
+    </button>
+  </div>
+  <!-- Unselect Button -->
+  <div class="ms-0 ms-lg-3 mb-2">
+    <button type="button" class="btn btn-secondary btn-select-toggle" [disabled]="unselectedAppsCount() == 0"
+      (click)="onSelectionToggle(false)">
+      Unselect {{ unselectedAppsCount() }}
+    </button>
+    <!-- Select Button -->
+    <button type="button" class="btn btn-secondary btn-select-toggle ms-3" [disabled]="selectableAppsCount () == 0"
+      (click)="onSelectionToggle(true)">
+      Select {{ selectableAppsCount () }}
+    </button>
+  </div>
+</div>

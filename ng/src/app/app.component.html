@@ -21,46 +21,27 @@
   <!-- All Buttons & Search Input-->
   <div class="d-flex flex-column flex-lg-row mb-3 w-100">
 
-    <!-- Install Button -->
     @if(!isTemplateUrl) {
-    <app-button-installer />
+    <!-- Install Button -->
+    <app-button-installer [selectedApps]="selectedApps" (installSelectedApps)="postAppsToInstall()"
+      [unselectedAppsCount]="appsToUnselectLength" [selectableAppsCount]="appToSelectLength"
+      (selectionToggled)="toggleAppSelection($event)" />
     } @else if(isTemplateUrl) {
+    <!-- Template Button -->
     <app-button-template />
     }
-
-
-    <div class="d-flex">
-      <!-- Download Button -->
-      <div class="mb-2">
-        <button [disabled]="selectedApps?.length == 0" type="button" class="btn btn-darkblue text-nowrap"
-          (click)="postAppsToInstall()">
-          <span>Install selected {{ selectedApps?.length }} apps</span>
-        </button>
-      </div>
-      <!-- Unselect Button -->
-      <div class="ms-0 ms-lg-3 mb-2">
-        <button type="button" class="btn btn-secondary btn-select-toggle" [disabled]="appsToUnselectLength == 0"
-          (click)="toggleAppSelection(false)">
-          Unselect {{ appsToUnselectLength }}
-        </button>
-        <!-- Select Button -->
-        <button type="button" class="btn btn-secondary btn-select-toggle ms-3" [disabled]="appToSelectLength == 0"
-          (click)="toggleAppSelection(true)">
-          Select {{ appToSelectLength }}
-        </button>
-      </div>
-    </div>
-    
 
     <!-- Search  -->
     <div class="ms-0 ms-lg-3 mb-2">
       <input class="form-control" [formControl]="searchForm" type="search" placeholder="Search..." />
     </div>
+
     <!-- Button tiles or list View -->
     <div class="view-toggle ms-auto">
       <mat-icon (click)="changeView(viewModes.Tiles)" class="me-3">grid_on</mat-icon>
       <mat-icon (click)="changeView(viewModes.List)" class="me-3">list</mat-icon>
     </div>
+
   </div>
   <p>In case you're wondering, we'll install the following apps:</p>
   <!-- Error, there are no apps matching your version -->

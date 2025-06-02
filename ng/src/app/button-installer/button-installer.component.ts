@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, input, output } from '@angular/core';
+import { App } from '../app-interface';
 
 @Component({
   selector: 'app-button-installer',
@@ -7,5 +8,21 @@ import { Component } from '@angular/core';
   standalone: false
 })
 export class ButtonInstallerComponent {
+  selectedApps = input.required<App[]>();
+  unselectedAppsCount = input.required<number>();
+  selectableAppsCount = input.required<number>();
+
+  installSelectedApps = output<void>();
+  selectionToggled = output<boolean>();
+
+
+  onInstallClicked() {
+    this.installSelectedApps.emit();
+  }
+
+  onSelectionToggle(value: boolean) {
+    this.selectionToggled.emit(value);
+  }
 
 }
+
