@@ -4,45 +4,53 @@
 </div>
 }
 
-
-
-
 @if (hasUrlParams) {
 <div class="container-fluid">
   <div class="row mb-2">
     <div class="col-12 mt-3">
-      <!-- Intro -->
-      <h2>Let's auto-install some popular apps</h2>
-      <p class="mb-3">
-        Don't worry: if you don't like one, you can remove it later without
-        side-effects :)
-        <strong>
-          {{recommendedAppsTitle}}
-        </strong>
-      </p>
+      <!-- Intro (App-Header) -->
+      @if(!isTemplateUrl) {
+      <app-header title="Let's auto-install some popular apps" description="Don't worry: if you don't like one, you can remove it later without
+        side-effects :)" [strongText]="recommendedAppsTitle" />
+      } @else if(isTemplateUrl) {
+      <app-header title="Let's install a Template App" description=" Don't worry: You cann remove unsued logic later"
+        strongText="Recommendes Template for:" />
+      }
     </div>
   </div>
   <!-- All Buttons & Search Input-->
   <div class="d-flex flex-column flex-lg-row mb-3 w-100">
-    <div class="mb-2">
+
+    <!-- Install Button -->
+    @if(!isTemplateUrl) {
+    <app-button-installer />
+    } @else if(isTemplateUrl) {
+    <app-button-template />
+    }
+
+
+    <div class="d-flex">
       <!-- Download Button -->
-      <button [disabled]="selectedApps?.length == 0" type="button" class="btn btn-darkblue text-nowrap"
-        (click)="postAppsToInstall()">
-        <span>Install selected {{ selectedApps?.length }} apps</span>
-      </button>
+      <div class="mb-2">
+        <button [disabled]="selectedApps?.length == 0" type="button" class="btn btn-darkblue text-nowrap"
+          (click)="postAppsToInstall()">
+          <span>Install selected {{ selectedApps?.length }} apps</span>
+        </button>
+      </div>
+      <!-- Unselect Button -->
+      <div class="ms-0 ms-lg-3 mb-2">
+        <button type="button" class="btn btn-secondary btn-select-toggle" [disabled]="appsToUnselectLength == 0"
+          (click)="toggleAppSelection(false)">
+          Unselect {{ appsToUnselectLength }}
+        </button>
+        <!-- Select Button -->
+        <button type="button" class="btn btn-secondary btn-select-toggle ms-3" [disabled]="appToSelectLength == 0"
+          (click)="toggleAppSelection(true)">
+          Select {{ appToSelectLength }}
+        </button>
+      </div>
     </div>
-    <!-- Unselect Button -->
-    <div class="ms-0 ms-lg-3 mb-2">
-      <button type="button" class="btn btn-secondary btn-select-toggle" [disabled]="appsToUnselectLength == 0"
-        (click)="toggleAppSelection(false)">
-        Unselect {{ appsToUnselectLength }}
-      </button>
-      <!-- Select Button -->
-      <button type="button" class="btn btn-secondary btn-select-toggle ms-3" [disabled]="appToSelectLength == 0"
-        (click)="toggleAppSelection(true)">
-        Select {{ appToSelectLength }}
-      </button>
-    </div>
+
     <!-- Search  -->
     <div class="ms-0 ms-lg-3 mb-2">
       <input class="form-control" [formControl]="searchForm" type="search" placeholder="Search..." />

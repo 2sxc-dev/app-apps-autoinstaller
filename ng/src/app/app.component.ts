@@ -31,7 +31,6 @@ enum ViewModes {
 })
 export class AppComponent extends SxcAppComponent {
 
-
   baseUrl: string = environment.baseUrl;
 
   appsFilteredByRules$!: Observable<App[]>; //all apps from the service
