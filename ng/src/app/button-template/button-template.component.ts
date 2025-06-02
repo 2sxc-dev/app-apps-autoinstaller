@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
   selector: 'app-button-template',
   templateUrl: './button-template.component.html',
   styleUrl: './button-template.component.scss',
-  standalone: false
+  standalone: true
 })
 export class ButtonTemplateComponent {
 

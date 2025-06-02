@@ -10,8 +10,13 @@ import {
   share,
 } from "rxjs";
 import { DataService } from "./services/data.service";
-import { FormControl } from "@angular/forms";
+import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { environment } from "../environments/environment";
+import { HeaderComponent } from "./header/header.component";
+import { ButtonInstallerComponent } from "./button-installer/button-installer.component";
+import { ButtonTemplateComponent } from "./button-template/button-template.component";
+import { MatIconModule } from "@angular/material/icon";
+import { AsyncPipe } from "@angular/common";
 
 // LINK: https://2sxc.org/apps/auto-install-15?ModuleId=1199&2SexyContentVersion=13.11.00&platform=Dnn&sysversion=9.1.1&sxcversion=13.01.03
 
@@ -24,10 +29,20 @@ enum ViewModes {
 }
 
 @Component({
-    selector: "app-root",
-    templateUrl: "./app.component.html",
-    styleUrls: ["./app.component.scss"],
-    standalone: false
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.scss"],
+  standalone: true,
+  imports: [
+    HeaderComponent,
+    ButtonInstallerComponent,
+    ButtonTemplateComponent,
+    MatIconModule,
+    AsyncPipe,
+    ReactiveFormsModule,
+    FormsModule,
+
+  ],
 })
 export class AppComponent extends SxcAppComponent {
 
@@ -101,13 +116,16 @@ export class AppComponent extends SxcAppComponent {
       this.searchString.next(value);
     });
 
+    // Check if Template or App Installer to load the correct data
+    const query = this.isTemplateUrl ? "TemplateList" : "AutoInstaller";
     // filter data from the service to the rules
     this.appsFilteredByRules$ = this.dataService
       .getApps(
         this.sxcVersion,
         this.sysversion,
         this.sexyContentVersion,
-        this.moduleId
+        this.moduleId,
+        query
       )
       .pipe(
         combineLatestWith(this.sxcRules),

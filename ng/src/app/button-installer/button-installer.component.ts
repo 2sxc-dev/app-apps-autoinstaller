@@ -5,7 +5,7 @@ import { App } from '../app-interface';
   selector: 'app-button-installer',
   templateUrl: './button-installer.component.html',
   styleUrl: './button-installer.component.scss',
-  standalone: false
+  standalone: true,
 })
 export class ButtonInstallerComponent {
   selectedApps = input.required<App[]>();
