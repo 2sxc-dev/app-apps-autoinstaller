@@ -2,91 +2,87 @@
 <div class="alert alert-danger" role="alert">
   ERROR: Check URL parameters
 </div>
-}
-
-@if (hasUrlParams) {
+} @else {
 <div class="container-fluid">
+  <!-- Header -->
   <div class="row mb-2">
     <div class="col-12 mt-3">
-      <!-- Intro (App-Header) -->
-      @if(!isTemplateUrl) {
-      <app-header title="Let's auto-install some popular apps" description="Don't worry: if you don't like one, you can remove it later without
-        side-effects :)" [strongText]="recommendedAppsTitle" />
-      } @else if(isTemplateUrl) {
-      <app-header title="Let's create a App with a Template" description=" Don't worry: You cann remove unsued logic later"
-        strongText="Recommendes Template for:" />
+      @if (!isTemplateMode) {
+      <app-header title="Let's auto-install some popular apps"
+        description="Don't worry: if you don't like one, you can remove it later without side-effects :)"
+        [strongText]="recommendedAppsTitle" />
+      } @else {
+      <app-header title="Let's create an App with a Template"
+        description="Don't worry: You can remove unused logic later" strongText="Recommended Template for:" />
       }
     </div>
   </div>
-  <!-- All Buttons & Search Input-->
-  <div class="d-flex flex-column flex-lg-row mb-3 w-100">
 
-    @if(!isTemplateUrl) {
-    <!-- Install Button -->
-    <app-button-installer [selectedApps]="selectedApps" (installSelectedApps)="postAppsToInstall()"
-      [unselectedAppsCount]="appsToUnselectLength" [selectableAppsCount]="appToSelectLength"
-      (selectionToggled)="toggleAppSelection($event)" />
-    } @else if(isTemplateUrl) {
-    <!-- Template Button -->
-    <app-button-template [selectTemplate]="selectedApps" (createNewApp)="createNewAppWithOrWithoutTemplate($event)" />
+  <!-- Buttons & Search Input -->
+  <div class="d-flex flex-column flex-lg-row mb-3 w-100">
+    @if (!isTemplateMode) {
+    <app-button-installer [selectedApps]="selectedApps" (installSelectedApps)="postSelectedAppsToParent()"
+      [unselectedAppsCount]="numAppsToUnselect" [selectableAppsCount]="numAppsToSelect"
+      (selectionToggled)="toggleAllAppsSelection($event)" />
+    } @else {
+    <app-button-template [selectTemplate]="selectedApps" (createNewApp)="createAppWithOrWithoutTemplate($event)" />
     }
 
-    <!-- Search  -->
+    <!-- Search -->
     <div class="ms-0 ms-lg-3 mb-2">
-      <input class="form-control" [formControl]="searchForm" type="search" placeholder="Search..." />
+      <input class="form-control" [formControl]="searchControl" type="search" placeholder="Search..." />
     </div>
 
-    <!-- Button tiles or list View -->
+    <!-- View toggle buttons -->
     <div class="view-toggle ms-auto">
-      <mat-icon (click)="changeView(viewModes.Tiles)" class="me-3">grid_on</mat-icon>
-      <mat-icon (click)="changeView(viewModes.List)" class="me-3">list</mat-icon>
+      <mat-icon (click)="changeViewMode(ViewModes.Tiles)">grid_on</mat-icon>
+      <mat-icon (click)="changeViewMode(ViewModes.List)">list</mat-icon>
     </div>
-
   </div>
+
   <p>In case you're wondering, we'll install the following apps:</p>
-  <!-- Error, there are no apps matching your version -->
-  @if ((appsFilteredByRules$ | async)?.length == 0) {
+
+  <!-- Error: No apps for this version -->
+  @if ((filteredApps$ | async)?.length === 0) {
   <div class="alert alert-danger" role="alert">
     ERROR: There is no app for this version.
   </div>
   }
-  <!-- Warning, there are no apps found based on your search criteria -->
-  @if ((appsFilteredByRules$ | async)?.length > 0 && (apps$ | async)?.length == 0) {
+
+  <!-- Warning: No data found based on search -->
+  @if ((filteredApps$ | async)?.length > 0 && (displayApps$ | async)?.length === 0) {
   <div class="alert alert-warning" role="alert">
     No Data found, check the search criteria.
   </div>
   }
-  <!-- Alle Apps  -->
-  @if (apps$ | async; as apps) {
-  <!-- Tiles view -->
-  @if (currentMode == viewModes.Tiles) {
+
+  <!-- All Apps -->
+  @if (displayApps$ | async; as apps) {
+  @if (currentViewMode === ViewModes.Tiles) {
   <div class="row mb-2">
     @for (app of apps; track app) {
     <div class="col-12 col-sm-4 col-md-4 col-lg-3 col-xxl-2 mb-3 app-view-tiles">
       <div class="card bg-light">
-        <div class="row g-0 position-relative app-view-item" (click)="onAppClickEvent($event.target.tagName, app)">
+        <div class="row g-0 position-relative app-view-item" (click)="onAppCheckboxToggle($event.target.tagName, app)">
           <div class="col-md-4">
-            <img src="{{baseUrl}}/{{ app.icon }}?w=800" class="img-fluid rounded-start align-items-center"
-              alt="{{ app.displayName }}" />
+            <img [src]="baseUrl + '/' + app.icon + '?w=800'" class="img-fluid rounded-start align-items-center"
+              [alt]="app.displayName" />
           </div>
           <div class="col-md-8">
             <div class="card-body py-3 py-md-0 d-flex flex-column h-100 justify-content-center">
               <div>
                 <a class="title-hover vertical-middle mb-1" target="_blank"
-                  href="{{baseUrl}}/apps/details/app/{{ app.urlKey }}">
-                  <h5 class="fs-6 card-title mb-0">
-                    {{ app.displayName }}
-                  </h5>
+                  [href]="baseUrl + '/apps/details/app/' + app.urlKey">
+                  <h5 class="fs-6 card-title mb-0">{{ app.displayName }}</h5>
                   <mat-icon class="arrow-icon">north_east</mat-icon>
                 </a>
               </div>
               <div class="card-text">
-                <a class="version-link version-hover" href="{{ app.gitHubRelease }}" target="_blank">
-                  {{ app.version }}<mat-icon class="zip-icon">folder_zip</mat-icon>
+                <a class="version-link version-hover" [href]="app.gitHubRelease" target="_blank">
+                  {{ app.version }}
+                  <mat-icon class="zip-icon">folder_zip</mat-icon>
                 </a>
-                <!-- isTemplateUrl -->
-                <input class="checkbox-item check-size" type="checkbox" [(ngModel)]="app.isSelected"
-                  [(value)]="app.urlKey" />
+                <input class="checkbox-item check-size" type="checkbox" [checked]="app.isSelected" readonly />
               </div>
             </div>
           </div>
@@ -95,44 +91,44 @@
     </div>
     }
   </div>
-  }
-  <!-- List view -->
-  @if (currentMode == viewModes.List) {
+  } @else {
   <div>
     @for (app of apps; track app) {
-    <div class="d-flex align-items-center p-2 mb-3 app-view-list w-100" (click)="onAppClickEvent($event, app)">
+    <div class="d-flex align-items-center p-2 app-view-list w-100" (click)="onAppCheckboxToggle($event, app)">
       <div class="d-flex align-items-center">
-        <img src="{{baseUrl}}/{{ app.icon }}?w=50" class="img-fluid rounded-start align-items-center min-w-50"
-          alt="{{ app.displayName }}" />
+        <img [src]="baseUrl + '/' + app.icon + '?w=50'" class="img-fluid rounded-start align-items-center min-w-50"
+          [alt]="app.displayName" />
       </div>
       <div class="d-flex flex-column ps-3 app-view-list-item">
         <div>
-          <a target="_blank" href="{{baseUrl}}/apps/details/app/{{ app.urlKey }}" class="title-hover align-middle mb-1">
+          <a target="_blank" [href]="baseUrl + '/apps/details/app/' + app.urlKey" class="title-hover align-middle mb-1">
             <h5 class="fs-6 mb-0">{{ app.displayName }}</h5>
             <mat-icon class="arrow-icon">north_east</mat-icon>
           </a>
         </div>
         <div>
-          <a class="version-link version-hover position-relative" href="{{ app.gitHub }}" target="_blank">{{app.version
-            }}
-            <mat-icon class="zip-icon">folder_zip</mat-icon></a>
+          <a class="version-link version-hover position-relative" [href]="app.gitHub" target="_blank">
+            {{ app.version }}
+            <mat-icon class="zip-icon">folder_zip</mat-icon>
+          </a>
         </div>
       </div>
       <div class="ms-auto">
-        <input class="check-size" type="checkbox" [(ngModel)]="app.isSelected" [(value)]="app.urlKey" />
+        <input class="check-size" type="checkbox" [checked]="app.isSelected" readonly />
       </div>
     </div>
     }
   </div>
   }
   }
-  <!-- Outro  -->
+
+  <!-- Outro -->
   <div class="row">
     <p>
       This dialog will disappear when you've added or created your first app. It
       will appear again on every new portal, as the apps are per portal. If you
       want to add more apps later on, just get them from the
-      <a href="{{baseUrl}}/apps" target="_blank">app catalog</a>
+      <a [href]="baseUrl + '/apps'" target="_blank">app catalog</a>.
     </p>
   </div>
 </div>

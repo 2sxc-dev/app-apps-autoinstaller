@@ -18,11 +18,7 @@ import { ButtonTemplateComponent } from "./button-template/button-template.compo
 import { MatIconModule } from "@angular/material/icon";
 import { AsyncPipe } from "@angular/common";
 
-// LINK: https://2sxc.org/apps/auto-install-15?ModuleId=1199&2SexyContentVersion=13.11.00&platform=Dnn&sysversion=9.1.1&sxcversion=13.01.03
-
-// app runs on 2sxc.org under apps on the auto install page.
-// Npm local-ssl and localhost:4200
-
+// Enum für die View-Modi
 enum ViewModes {
   Tiles = "tiles",
   List = "list",
@@ -41,40 +37,48 @@ enum ViewModes {
     AsyncPipe,
     ReactiveFormsModule,
     FormsModule,
-
   ],
 })
 export class AppComponent extends SxcAppComponent {
 
+  ViewModes = ViewModes;
+
+  // ------ Properties ------
   baseUrl: string = environment.baseUrl;
 
-  appsFilteredByRules$!: Observable<App[]>; //all apps from the service
-  apps$!: Observable<App[]>; //all apps filtered by rules
-  sxcRules = new BehaviorSubject<Rules[]>([]);
-  searchString = new BehaviorSubject<string>("");
-  isAllSelected = new BehaviorSubject<Selected>({
-    selected: true,
-    forced: false,
-  }); // observable to select / deselect with true or false of the selecte box
-  selectedApp = new BehaviorSubject(<App>{});
+  /** Observable mit allen Apps, gefiltert nach Regeln */
+  filteredApps$!: Observable<App[]>;
+  /** Observable mit Apps, die nach Suche und Checkbox-Status gefiltert sind */
+  displayApps$!: Observable<App[]>;
 
-  selectedApps: App[]; // array for PostMessage
+  /** Regeln für App-Auswahl */
+  sxcRules$ = new BehaviorSubject<Rules[]>([]);
+  /** Suchbegriff */
+  searchTerm$ = new BehaviorSubject<string>("");
+  /** Zustand der "Alle auswählen"-Checkbox */
+  allSelected$ = new BehaviorSubject<Selected>({ selected: false, forced: true });
+  /** Aktuell selektierte App (für Single-Select oder Details) */
+  selectedApp$ = new BehaviorSubject<App>({} as App);
+  /** Liste der aktuell markierten Apps */
+  selectedApps: App[] = [];
+  /** Formular-Control für die Suche */
+  searchControl = new FormControl();
 
-  searchForm = new FormControl();
+  /** Anzahl zu selektierender Apps (für UI) */
+  numAppsToSelect: number = 0;
+  /** Anzahl zu deselektierender Apps (für UI) */
+  numAppsToUnselect: number = 0;
+  /** Aktueller View-Mode */
+  currentViewMode: ViewModes = ViewModes.Tiles;
 
-  appToSelectLength: number;
-  appsToUnselectLength: number;
-  viewModes = ViewModes;
-  currentMode: string = ViewModes.Tiles;
-
-  // URL PARAMETERS
+  // URL-Parameter
   params = new URLSearchParams(window.location.search);
   sxcVersion = this.params.get("sxcversion");
-  sysversion = this.params.get("sysversion");
+  sysVersion = this.params.get("sysversion");
   sexyContentVersion = this.params.get("2SexyContentVersion");
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
-  isTemplateUrl = false;
+  isTemplateMode = false;
 
   recommendedAppsTitle: string = "Recommended Apps for";
 
@@ -86,161 +90,191 @@ export class AppComponent extends SxcAppComponent {
     super(el, context);
   }
 
-  // Message received from the outer window
-  @HostListener("window:message", ["$event"]) onPostMessage(event) {
-    if (typeof event.data == "string") {
-      const messageDate = JSON.parse(event.data);
-      // TODO:: Message from the outer window (Install Apps)
+  // ------ HostListener für Nachrichten vom Parent (z.B. Regeln neu setzen) ------
+  @HostListener("window:message", ["$event"])
+  onPostMessage(event: MessageEvent) {
+    if (typeof event.data !== "string") return;
+    const message = JSON.parse(event.data);
 
-      if (messageDate.action == "specs" && messageDate.data != undefined) {
-        this.sxcRules.next(messageDate.data.rules || []);
-      }
+    // Regeln vom Parent erhalten
+    if (message.action === "specs" && message.data?.rules) {
+      this.sxcRules$.next(message.data.rules);
     }
   }
 
+  // ------ Lifecycle ------
   ngOnInit(): void {
+    this.sendSpecsRequestToParent();
+    this.initParamsFromUrl();
+    this.setupSearchControl();
+    this.setupFilteredAppsStream();
+    this.setupDisplayAppsStream();
+  }
 
-    // send a specs message from the Ifram to the outer window
-    var message = { action: "specs", moduleId: this.moduleId };
+  /** Sende Specs-Request an Parent (z.B. für Regeln) */
+  private sendSpecsRequestToParent() {
+    const message = { action: "specs", moduleId: this.moduleId };
     window.parent.postMessage(JSON.stringify(message), "*");
+  }
 
+  /** Lese Parameter aus der URL und setze Flags */
+  private initParamsFromUrl() {
     this.hasUrlParams =
       this.params.has("sysversion") &&
       this.params.has("sxcversion") &&
       this.params.has("2SexyContentVersion");
 
-    this.isTemplateUrl = this.params.has("isTemplate");
+    this.isTemplateMode = this.params.has("isTemplate");
 
-    this.searchForm.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
-      this.isAllSelected.next({ selected: true, forced: false });
-      this.searchString.next(value);
+    // Wenn nicht Template-Modus, alle Apps vorselektieren
+    if (!this.isTemplateMode) {
+      this.allSelected$.next({ selected: true, forced: true });
+    }
+  }
+
+  // Setup für das Suchfeld 
+  private setupSearchControl() {
+    this.searchControl.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
+      this.searchTerm$.next(value ?? "");
     });
+  }
 
-    // Check if Template or App Installer to load the correct data
-    const query = this.isTemplateUrl ? "TemplateList" : "AutoInstaller";
-    // filter data from the service to the rules
-    this.appsFilteredByRules$ = this.dataService
+  /** Setup: Apps vom Service laden und nach Regeln filtern */
+  private setupFilteredAppsStream() {
+    const queryType = this.isTemplateMode ? "TemplateList" : "AutoInstaller";
+    this.filteredApps$ = this.dataService
       .getApps(
         this.sxcVersion,
-        this.sysversion,
+        this.sysVersion,
         this.sexyContentVersion,
         this.moduleId,
-        query
+        queryType
       )
       .pipe(
-        combineLatestWith(this.sxcRules),
-        map(([apps, sxcrules]) => {
-          this.recommendedAppsTitle = apps[0].title;
-          // check if all apps are forbidden
-          var allForbidden =
-            sxcrules.filter((rule: Rules) => rule.mode == "f" && rule.target == "all")
-              .length >= 1;
-
-          // if all apps are forbidden, only the apps that are allowed (whitelisten) by the rules are displayed
-          if (allForbidden) {
-            const appsAllowedBySxcRules = apps.filter(
-              (app) =>
-                sxcrules.filter(
-                  (rule: Rules) =>
-                    rule.mode == "a" &&
-                    rule.target == "guid" &&
-                    rule.appGuid == app.guid
-                ).length > 0
-            );
-            if (appsAllowedBySxcRules.length > 0) {
-              return appsAllowedBySxcRules;
-            }
-            return [];
-          }
-          // if all apps are allowed, only the apps that are forbidden (blacklisten) by the rules are displayed
-          const forbiddenApps = apps.filter(
-            (app) =>
-              sxcrules.filter(
-                (rule: Rules) =>
-                  rule.mode == "f" &&
-                  rule.target == "guid" &&
-                  rule.appGuid == app.guid
-              ).length > 0
-          );
-          const allowedApps = apps.filter(
-            (app) => !forbiddenApps.includes(app)
-          );
-
-          // if the app is optional, the checkbox is not selected
-          allowedApps.forEach((app) => {
-            const isOptional =
-              sxcrules.filter(
-                (rule: Rules) =>
-                  rule.mode == "o" &&
-                  rule.target == "guid" &&
-                  rule.appGuid == app.guid
-              ).length == 1;
-            app.isSelected = isOptional ? false : true;
-          });
-
-          allowedApps.sort((a, b) =>
-            a.displayName.localeCompare(b.displayName)
-          ); // sorted apps von A - Z
-
-          return allowedApps;
-        })
+        combineLatestWith(this.sxcRules$),
+        map(([apps, rules]) => this.applyRulesToApps(apps, rules))
       );
+  }
 
-    // all Apps
-    this.apps$ = this.appsFilteredByRules$.pipe(
+  /** Setup: Apps für die Anzeige nach Suchbegriff und Checkbox-Status filtern */
+  private setupDisplayAppsStream() {
+    this.displayApps$ = this.filteredApps$.pipe(
       combineLatestWith(
-        this.isAllSelected,
-        this.searchString,
-        this.selectedApp
-      ), // dependence from apps$
-      map(([apps, allSelected, searchString, selectedApp]) => {
-        const searchedApps = apps.filter((item: App) => {
-          return item.displayName
-            .toLocaleLowerCase()
-            .includes(searchString.toLowerCase());
-        });
+        this.allSelected$,
+        this.searchTerm$,
+        this.selectedApp$
+      ),
+      map(([apps, allSelected, searchTerm, selectedApp]) => {
+        const filteredApps = this.filterAppsBySearch(apps, searchTerm);
+        this.updateAppSelection(filteredApps, allSelected);
+        this.updateSelectionCounts(filteredApps);
 
-        const appsToChangeSelection = searchString != "" ? searchedApps : apps;
-
-        appsToChangeSelection.forEach((app) => {
-          app.isSelected = allSelected.forced
-            ? allSelected.selected
-            : app.isSelected;
-        });
-
-        // number of selected apps to install
-        this.selectedApps = apps.filter((app) => app.isSelected == true) || [];
-
-        // number of unselected or selected
-        const selected = searchedApps.filter((app) => app.isSelected == true);
-        this.appsToUnselectLength = selected.length;
-        this.appToSelectLength =
-          searchedApps.length - this.appsToUnselectLength;
-
-        return searchedApps; // return the apps with the new status to the apps$ we access late
+        return filteredApps;
       }),
       share()
     );
   }
 
-  // select or unselect checkboxes
-  onAppClickEvent(tagName: string, app: App) {
-    // mat-icon like a are not used for select and should redirect to a link
-    if (tagName == "A" || tagName == "MAT-ICON") return;
+  /** Filtert Apps basierend auf den aktuellen Regeln */
+  private applyRulesToApps(apps: App[], rules: Rules[]): App[] {
+    if (apps.length === 0) return [];
 
-    this.isAllSelected.next({ selected: true, forced: false });
 
-    app.isSelected = !app.isSelected;
-    this.selectedApp.next(app); // behavior pass an app with isSelected status
+    this.recommendedAppsTitle = "Recommended Apps for";
+
+    // Prüfe, ob alle Apps per Regel verboten wurden
+    const allForbidden = rules.some(rule =>
+      rule.mode === "f" && rule.target === "all"
+    );
+
+    if (allForbidden) {
+      // Nur explizit erlaubte Apps anzeigen
+      const allowed = apps.filter(app =>
+        rules.some(rule =>
+          rule.mode === "a" &&
+          rule.target === "guid" &&
+          rule.appGuid === app.guid
+        )
+      );
+      return allowed.length > 0 ? allowed : [];
+    }
+
+    // Apps, die explizit verboten sind
+    const forbiddenApps = apps.filter(app =>
+      rules.some(rule =>
+        rule.mode === "f" &&
+        rule.target === "guid" &&
+        rule.appGuid === app.guid
+      )
+    );
+    // Alle übrigen Apps sind erlaubt
+    const allowedApps = apps.filter(app => !forbiddenApps.includes(app));
+    // Optional-Apps werden nicht selektiert, alle anderen schon
+    allowedApps.forEach(app => {
+      const isOptional = rules.some(rule =>
+        rule.mode === "o" &&
+        rule.target === "guid" &&
+        rule.appGuid === app.guid
+      );
+      app.isSelected = !isOptional;
+    });
+    // Alphabetisch sortieren
+    allowedApps.sort((a, b) => a.displayName.localeCompare(b.displayName));
+    return allowedApps;
   }
 
-  // sends the selected apps with the displayNmae and url to the outer window
-  postAppsToInstall() {
-    const appsToInstall = this.selectedApps.map((data) => {
-      return { displayName: data.displayName, url: data.downloadUrl };
-    });
+  /** Filtert Apps nach Suchbegriff */
+  private filterAppsBySearch(apps: App[], searchTerm: string): App[] {
+    if (!searchTerm) return apps;
+    return apps.filter(app =>
+      app.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }
 
-    var message = {
+  /** Setzt die Auswahl-Checkboxen je nach "Alle auswählen"-Status */
+  private updateAppSelection(apps: App[], allSelected: Selected) {
+    apps.forEach(app => {
+      app.isSelected = allSelected.forced
+        ? allSelected.selected
+        : app.isSelected;
+    });
+  }
+
+  /** Aktualisiert Zähler für selektierte und nicht selektierte Apps */
+  private updateSelectionCounts(apps: App[]) {
+    this.selectedApps = apps.filter(app => app.isSelected);
+    this.numAppsToUnselect = this.selectedApps.length;
+    this.numAppsToSelect = apps.length - this.numAppsToUnselect;
+  }
+
+  // ------ Event-Handler ------
+
+  /** Checkbox für ein App-Element toggeln */
+  onAppCheckboxToggle(tagName: string, app: App): void {
+    if (tagName === "A" || tagName === "MAT-ICON") return;
+
+    if (this.isTemplateMode) {
+      // Im Template-Modus: Multi-Select
+      this.allSelected$.next({ selected: false, forced: true });
+      this.allSelected$.next({ selected: true, forced: false });
+      app.isSelected = !app.isSelected;
+      this.selectedApp$.next(app);
+    } else {
+      // Im Installer-Modus: Multi-Select
+      this.allSelected$.next({ selected: true, forced: false });
+      app.isSelected = !app.isSelected;
+      this.selectedApp$.next(app);
+    }
+  }
+
+  /** Sende die aktuell ausgewählten Apps an das Parent-Fenster */
+  postSelectedAppsToParent() {
+    const appsToInstall = this.selectedApps.map(data => ({
+      displayName: data.displayName,
+      url: data.downloadUrl,
+    }));
+
+    const message = {
       action: "install",
       moduleId: this.moduleId,
       packages: appsToInstall,
@@ -248,32 +282,30 @@ export class AppComponent extends SxcAppComponent {
     window.parent.postMessage(JSON.stringify(message), "*");
   }
 
-  // checkboxen state true or false
-  toggleAppSelection(val: boolean) {
-    this.isAllSelected.next({ selected: val, forced: true });
+  /** Toggle für "Alle Apps auswählen" */
+  toggleAllAppsSelection(selectAll: boolean) {
+    this.allSelected$.next({ selected: selectAll, forced: true });
   }
 
-  // List or tiles view switchen
-  changeView(mode: string) {
-    this.currentMode = mode;
+  /** Wechsel zwischen Listen- und Kachelansicht */
+  changeViewMode(mode: ViewModes) {
+    this.currentViewMode = mode;
   }
 
-  createNewAppWithOrWithoutTemplate(hasTemplate: boolean) {
-      const templateApp = this.selectedApps.map((data) => {
-      return { displayName: data.displayName, url: data.downloadUrl };
-    });
-    console.log("createNewAppWithOrWithoutTemplate", hasTemplate, templateApp);
+  /** (Optional) Neue App mit oder ohne Template erstellen */
+  createAppWithOrWithoutTemplate(hasTemplate: boolean) {
+    const templateApps = this.selectedApps.map(data => ({
+      displayName: data.displayName,
+      url: data.downloadUrl,
+    }));
+    console.log("createAppWithOrWithoutTemplate", hasTemplate, templateApps);
 
-    return;
-
-
-     var message = {
-      action: "template",
-      moduleId: this.moduleId,
-      packages: templateApp,
-    };
-    window.parent.postMessage(JSON.stringify(message), "*");
-
+    // Optional: Nachricht ans Parent senden
+    // const message = {
+    //   action: "template",
+    //   moduleId: this.moduleId,
+    //   packages: templateApps,
+    // };
+    // window.parent.postMessage(JSON.stringify(message), "*");
   }
-
 }

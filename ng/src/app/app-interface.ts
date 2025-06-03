@@ -12,6 +12,7 @@ export interface App {
   minDnn: string;
   min2Sxc: string;
   minOqt: string;
+  guid:string
 }
 
 export interface Rules {
