@@ -60,7 +60,7 @@
   @if (displayApps$ | async; as apps) {
   @if (currentViewMode === ViewModes.Tiles) {
   <div class="row mb-2">
-    @for (app of apps; track app) {
+    @for (app of apps; track app.guid) {
     <div class="col-12 col-sm-4 col-md-4 col-lg-3 col-xxl-2 mb-3 app-view-tiles">
       <div class="card bg-light">
         <div class="row g-0 position-relative app-view-item" (click)="onAppCheckboxToggle($event.target.tagName, app)">
@@ -93,7 +93,7 @@
   </div>
   } @else {
   <div>
-    @for (app of apps; track app) {
+    @for (app of apps; track app.guid) {
     <div class="d-flex align-items-center p-2 app-view-list w-100" (click)="onAppCheckboxToggle($event, app)">
       <div class="d-flex align-items-center">
         <img [src]="baseUrl + '/' + app.icon + '?w=50'" class="img-fluid rounded-start align-items-center min-w-50"

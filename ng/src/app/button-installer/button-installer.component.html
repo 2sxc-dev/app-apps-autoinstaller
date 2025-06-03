@@ -1,13 +1,13 @@
 <div class="d-flex">
   <!--  Download Button -->
-  <div class="mb-2">
+  <div class="mb-2 ">
     <button [disabled]="selectedApps()?.length == 0" type="button" class="btn btn-darkblue text-nowrap"
       (click)="onInstallClicked()">
       <span>Install selected {{ selectedApps()?.length }} apps</span>
     </button>
   </div>
   <!-- Unselect Button -->
-  <div class="ms-0 ms-lg-3 mb-2">
+  <div class="ms-3 mb-2">
     <button type="button" class="btn btn-secondary btn-select-toggle" [disabled]="unselectedAppsCount() == 0"
       (click)="onSelectionToggle(false)">
       Unselect {{ unselectedAppsCount() }}
