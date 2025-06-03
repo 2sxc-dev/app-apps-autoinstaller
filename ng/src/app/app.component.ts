@@ -7,7 +7,7 @@ import {
   debounceTime,
   map,
   Observable,
-  share,
+  shareReplay,
   take,
 } from "rxjs";
 import { DataService } from "./services/data.service";
@@ -19,7 +19,7 @@ import { ButtonTemplateComponent } from "./button-template/button-template.compo
 import { MatIconModule } from "@angular/material/icon";
 import { AsyncPipe } from "@angular/common";
 
-// Enum for view modes (tiles or list)
+// Define enum for switching between tile and list view modes
 enum ViewModes {
   Tiles = "tiles",
   List = "list",
@@ -41,32 +41,36 @@ enum ViewModes {
   ],
 })
 export class AppComponent extends SxcAppComponent {
-  ViewModes = ViewModes; // Make enum available for template
+  // For template use - expose enum
+  ViewModes = ViewModes;
+  // Base URL for API calls or navigation
   baseUrl: string = environment.baseUrl;
 
-  // Observable of all apps after rules filtering
+  // Observable for all apps, after rules are applied
   filteredApps$!: Observable<App[]>;
-  // Observable of displayable apps, filtered by search and selection state
+  // Observable for apps currently displayed in the UI (filtered by search)
   displayApps$!: Observable<App[]>;
 
-  // State observables for rules, search, and selection
+  // State management: rules, search term, selection, etc.
   sxcRules$ = new BehaviorSubject<Rules[]>([]);
   searchTerm$ = new BehaviorSubject<string>("");
-  allSelected$ = new BehaviorSubject<Selected>({ selected: false, forced: true });
-  selectedApp$ = new BehaviorSubject<App | null>(null);
-  selectedApps: App[] = []; // Array of currently selected apps
-  searchControl = new FormControl();
+  selectedApp$ = new BehaviorSubject<App | null>(null); // For single-select (template mode)
+  selectedApps: App[] = []; // Array of all currently selected apps
+  searchControl = new FormControl(); // For binding search input
 
+  // Counter for UI: number of selected/unselected in current view
   numAppsToSelect: number = 0;
   numAppsToUnselect: number = 0;
+  // Current view mode (tiles or list)
   currentViewMode: ViewModes = ViewModes.Tiles;
 
-  // URL parameters
+  // URL parameters & flags for initial state
   params = new URLSearchParams(window.location.search);
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
   isTemplateMode = false;
 
+  // Title for "recommended apps" section
   recommendedAppsTitle: string = "Recommended Apps for";
 
   constructor(
@@ -77,17 +81,18 @@ export class AppComponent extends SxcAppComponent {
     super(el, context);
   }
 
-  // Listen for postMessage from parent window (for rules updates)
+  // Listen for postMessage events from parent window (for receiving rules)
   @HostListener("window:message", ["$event"])
   onPostMessage(event: MessageEvent) {
     if (typeof event.data !== "string") return;
     const message = JSON.parse(event.data);
-    // Receive rules from parent
+    // Update rules if received from parent frame
     if (message.action === "specs" && message.data?.rules) {
       this.sxcRules$.next(message.data.rules);
     }
   }
 
+  // Initial setup when component mounts
   ngOnInit(): void {
     this.sendSpecsRequestToParent();
     this.initParamsFromUrl();
@@ -96,35 +101,29 @@ export class AppComponent extends SxcAppComponent {
     this.setupDisplayAppsStream();
   }
 
-  // Request rules/specs from parent window
+  // Request rules/specs from parent window (iframe usage)
   private sendSpecsRequestToParent() {
     const message = { action: "specs", moduleId: this.moduleId };
     window.parent.postMessage(JSON.stringify(message), "*");
   }
 
-  // Read initial state from URL parameters and set flags
+  // Parse URL parameters and set initial state flags
   private initParamsFromUrl() {
     this.hasUrlParams =
       this.params.has("sysversion") &&
       this.params.has("sxcversion") &&
       this.params.has("2SexyContentVersion");
-
     this.isTemplateMode = this.params.has("isTemplate");
-
-    // Pre-select all apps if not in template mode
-    if (!this.isTemplateMode) {
-      this.allSelected$.next({ selected: true, forced: true });
-    }
   }
 
-  // Set up debounced search
+  // Listen to search field and update searchTerm$ state, debounced
   private setupSearchControl() {
     this.searchControl.valueChanges.pipe(debounceTime(300)).subscribe((value) => {
       this.searchTerm$.next(value ?? "");
     });
   }
 
-  // Set up observable for filtered apps based on rules
+  // Get and filter apps from API, apply rules, emit as observable
   private setupFilteredAppsStream() {
     const queryType = this.isTemplateMode ? "TemplateList" : "AutoInstaller";
     const sxcVersion = this.params.get("sxcversion");
@@ -140,56 +139,42 @@ export class AppComponent extends SxcAppComponent {
       )
       .pipe(
         combineLatestWith(this.sxcRules$),
-        map(([apps, rules]) => this.applyRulesToApps(apps, rules))
+        map(([apps, rules]) => this.applyRulesToApps(apps, rules)),
+        shareReplay(1) // Share result for all subscribers
       );
   }
 
-  // Set up observable for displayable apps, considering selection and search
+  // Computes the array of apps to display, after search, selection, etc.
   private setupDisplayAppsStream() {
     this.displayApps$ = this.filteredApps$.pipe(
-      combineLatestWith(
-        this.allSelected$,
-        this.searchTerm$,
-        this.selectedApp$
-      ),
-      map(([apps, allSelected, searchTerm, selectedApp]) => {
+      combineLatestWith(this.searchTerm$, this.selectedApp$),
+      map(([apps, searchTerm, selectedApp]) => {
         const filteredApps = this.filterAppsBySearch(apps, searchTerm);
 
+        // Template mode: only one app can be selected at a time (radio behavior)
         if (this.isTemplateMode) {
-          // In template mode, only one app or none can be selected (radio-button style)
           let selectedKey = selectedApp && selectedApp.urlKey ? selectedApp.urlKey : null;
           filteredApps.forEach(app => app.isSelected = (app.urlKey === selectedKey));
-        } else {
-          // In installer mode, support multi-select and "select all"
-          filteredApps.forEach(app => {
-            app.isSelected = allSelected.forced
-              ? allSelected.selected
-              : app.isSelected;
-          });
         }
 
-        // Update selected apps array and selection counters
-        this.selectedApps = filteredApps.filter(app => app.isSelected);
-        this.numAppsToUnselect = this.selectedApps.length;
+        // Update UI counters and currently selected apps
+        this.selectedApps = apps.filter(app => app.isSelected);
+        this.numAppsToUnselect = filteredApps.filter(app => app.isSelected).length;
         this.numAppsToSelect = filteredApps.length - this.numAppsToUnselect;
-
         return filteredApps;
       }),
-      share()
+      shareReplay(1)
     );
   }
 
-  // Filter and initialize apps based on rules (allowed/forbidden/optional)
+  // Apply allow/forbid/optional rules to apps from backend
   private applyRulesToApps(apps: App[], rules: Rules[]): App[] {
     if (apps.length === 0) return [];
-
     this.recommendedAppsTitle = "Recommended Apps for";
-
     // If all apps are forbidden, only show those explicitly allowed
     const allForbidden = rules.some(rule =>
       rule.mode === "f" && rule.target === "all"
     );
-
     if (allForbidden) {
       const allowed = apps.filter(app =>
         rules.some(rule =>
@@ -200,8 +185,7 @@ export class AppComponent extends SxcAppComponent {
       );
       return allowed.length > 0 ? allowed : [];
     }
-
-    // Otherwise, exclude forbidden apps, mark optionals as not selected, rest are selected
+    // Otherwise: exclude forbidden, select all not-optional by default
     const forbiddenApps = apps.filter(app =>
       rules.some(rule =>
         rule.mode === "f" &&
@@ -222,7 +206,7 @@ export class AppComponent extends SxcAppComponent {
     return allowedApps;
   }
 
-  // Search apps by displayName using lowercase includes
+  // Filter apps by search term (case-insensitive)
   private filterAppsBySearch(apps: App[], searchTerm: string): App[] {
     if (!searchTerm) return apps;
     return apps.filter(app =>
@@ -231,15 +215,14 @@ export class AppComponent extends SxcAppComponent {
   }
 
   /**
-   * Handles checkbox toggle for app selection.
-   * In template mode: only one app can be selected (radio-style). Clicking selected again unselects all.
-   * In installer mode: multi-select, disables allSelected forced mode for individual selection.
+   * Handle checkbox toggle for app selection.
+   * - In template mode: only one can be selected (radio).
+   * - In installer mode: multi-select, toggles individual app.
    */
   onAppCheckboxToggle(tagName: string, app: App): void {
     if (tagName === "A" || tagName === "MAT-ICON") return;
-
     if (this.isTemplateMode) {
-      // Template mode: single-select (radio), allow deselect by clicking the same app
+      // Radio behavior: only one app can be selected
       this.filteredApps$.pipe(take(1)).subscribe(apps => {
         const wasSelected = app.isSelected;
         apps.forEach(a => a.isSelected = false);
@@ -251,20 +234,35 @@ export class AppComponent extends SxcAppComponent {
         }
       });
     } else {
-      // Installer mode: multi-select; reset forced-allSelected for individual toggles
-      this.allSelected$.next({ selected: false, forced: false });
+      // Multi-select: toggle the selected state
       app.isSelected = !app.isSelected;
       this.selectedApp$.next(app);
     }
   }
 
-  // Send selected apps to the parent window for installation
+  /**
+   * Toggle selection state for all currently visible apps (based on search/filter).
+   * Only apps present in the current search result will be selected/deselected.
+   */
+  toggleAllAppsSelection(selectAll: boolean) {
+    this.displayApps$.pipe(take(1)).subscribe(displayedApps => {
+      displayedApps.forEach(app => app.isSelected = selectAll);
+      // Optionally update counters immediately
+      this.filteredApps$.pipe(take(1)).subscribe(allApps => {
+        this.selectedApps = allApps.filter(app => app.isSelected);
+        this.numAppsToUnselect = displayedApps.filter(app => app.isSelected).length;
+        this.numAppsToSelect = displayedApps.length - this.numAppsToUnselect;
+      });
+    });
+  }
+
+  // Send selected apps to parent window (for installation)
   postSelectedAppsToParent() {
     const appsToInstall = this.selectedApps.map(data => ({
       displayName: data.displayName,
       url: data.downloadUrl,
     }));
-
+    console.log("createAppWithOrWithoutTemplate", appsToInstall);
     const message = {
       action: "install",
       moduleId: this.moduleId,
@@ -273,33 +271,18 @@ export class AppComponent extends SxcAppComponent {
     window.parent.postMessage(JSON.stringify(message), "*");
   }
 
-  // Toggles all app selections (used for "select all" checkbox)
-  toggleAllAppsSelection(selectAll: boolean) {
-    this.allSelected$.next({ selected: selectAll, forced: true });
-  }
-
-  // Switch between list and tile view modes
+  // Switch between tile and list views
   changeViewMode(mode: ViewModes) {
     this.currentViewMode = mode;
   }
 
-  // Handles creating an app with or without a template, sends info to parent
+  // Handler for creating an app with/without template (informational/logging)
   createAppWithOrWithoutTemplate(hasTemplate: boolean) {
     const templateApps = this.selectedApps.map(data => ({
       displayName: data.displayName,
       url: data.downloadUrl,
     }));
     console.log("createAppWithOrWithoutTemplate", hasTemplate, templateApps);
-
-    // Optionally send info to parent window
-    // const message = {
-    //   action: "template",
-    //   moduleId: this.moduleId,
-    //   packages: templateApps,
-    // };
-    // window.parent.postMessage(JSON.stringify(message), "*");
   }
 
-  // TrackBy function for ngFor in template
-  trackApp(index: number, app: App) { return app.urlKey; }
 }
