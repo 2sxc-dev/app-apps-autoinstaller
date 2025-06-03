@@ -28,7 +28,7 @@
       (selectionToggled)="toggleAppSelection($event)" />
     } @else if(isTemplateUrl) {
     <!-- Template Button -->
-    <app-button-template />
+    <app-button-template [selectTemplate]="selectedApps" (createNewApp)="createNewAppWithOrWithoutTemplate($event)" />
     }
 
     <!-- Search  -->
@@ -84,6 +84,7 @@
                 <a class="version-link version-hover" href="{{ app.gitHubRelease }}" target="_blank">
                   {{ app.version }}<mat-icon class="zip-icon">folder_zip</mat-icon>
                 </a>
+                <!-- isTemplateUrl -->
                 <input class="checkbox-item check-size" type="checkbox" [(ngModel)]="app.isSelected"
                   [(value)]="app.urlKey" />
               </div>

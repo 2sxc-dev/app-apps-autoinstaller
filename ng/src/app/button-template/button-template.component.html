@@ -1,1 +1,16 @@
-<p>button-template works!</p>
+<div class="d-flex">
+  @if(selectTemplate()?.length > 0){
+  <div class="mb-2">
+    <button [disabled]="selectTemplate()?.length == 0" type="button" class="btn btn-darkblue text-nowrap"
+      (click)="createAppWithOrWithoutTemplate(true)">
+      <span> Create new App with Template</span>
+    </button>
+  </div>
+  } @else {
+  <div class="mb-2">
+    <button type="button" class="btn btn-secondary btn-select-toggle text-nowrap" (click)="createAppWithOrWithoutTemplate(false)">
+      <span> Create new App without Template</span>
+    </button>
+  </div>
+  }
+</div>

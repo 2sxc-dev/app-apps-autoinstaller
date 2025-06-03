@@ -1,0 +1,26 @@
+
+$darkblue: #022f5a;
+
+.btn-darkblue {
+  background-color: $darkblue;
+  color: white;
+  transition: all 225ms ease-in-out;
+  &:hover {
+    background-color: lighten($darkblue, 5);
+    color: white;
+  }
+}
+
+.btn-main {
+  background-color: white;
+  color: white;
+  transition: all 225ms ease-in-out;
+  &:hover {
+    background-color: lighten($darkblue, 5);
+    color: white;
+  }
+}
+
+// .btn-select-toggle {
+//   width: 120px;
+// }

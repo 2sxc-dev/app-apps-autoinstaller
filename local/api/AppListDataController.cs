@@ -22,9 +22,10 @@ using Newtonsoft.Json;
 [AllowAnonymous]      // define that all commands can be accessed without a login
 // Inherit from Custom.Hybrid.Api14 to get features like App, CmsContext, Data etc.
 // see https://docs.2sxc.org/web-api/custom/index.html
-public class AppListDataController : Custom.Hybrid.Api14
+public class AppListDataController : Custom.Hybrid.Api14 /*TODO: Custom.Hybrid.ApiTyped*/
 {
-    [HttpGet]        // [HttpGet] says we're listening to GET requests
+    [HttpGet]   // [HttpGet] says we're listening to GET requests
+    // TODO: AppDataDto     
     public dynamic GetListOfData(string QueryName, string ModuleId, string SexyContentVersion, string Platform, string SysVersion, string SxcVersion)
     {
         var platform = Platform;
@@ -48,9 +49,7 @@ public class AppListDataController : Custom.Hybrid.Api14
 
 
         if (isOqtane)
-        {
             applicableVersions = applicableFor2sxc.Where(ai => !string.IsNullOrEmpty(ai.MinOqtVersion));
-        }
 
         var bestAI = applicableVersions.First();
         var title = bestAI.Title; // example "Recommended Apps for 2sxc 16.01 - latest"
@@ -69,9 +68,7 @@ public class AppListDataController : Custom.Hybrid.Api14
         }
 
         if (jsonToInstall.Length > 0)
-        {
             jsonToInstall = jsonToInstall.Substring(0, jsonToInstall.Length - 1);
-        }
 
         jsonToInstall = "[" + jsonToInstall + "]";
 

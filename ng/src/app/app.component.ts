@@ -257,4 +257,23 @@ export class AppComponent extends SxcAppComponent {
   changeView(mode: string) {
     this.currentMode = mode;
   }
+
+  createNewAppWithOrWithoutTemplate(hasTemplate: boolean) {
+      const templateApp = this.selectedApps.map((data) => {
+      return { displayName: data.displayName, url: data.downloadUrl };
+    });
+    console.log("createNewAppWithOrWithoutTemplate", hasTemplate, templateApp);
+
+    return;
+
+
+     var message = {
+      action: "template",
+      moduleId: this.moduleId,
+      packages: templateApp,
+    };
+    window.parent.postMessage(JSON.stringify(message), "*");
+
+  }
+
 }
