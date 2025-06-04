@@ -33,7 +33,6 @@ enum ViewModes {
   imports: [
     HeaderComponent,
     ButtonInstallerComponent,
-    ButtonTemplateComponent,
     MatIconModule,
     AsyncPipe,
     ReactiveFormsModule,
@@ -232,6 +231,9 @@ export class AppComponent extends SxcAppComponent {
         } else {
           this.selectedApp$.next(null);
         }
+
+        this.createAppWithOrWithoutTemplate(app.isSelected);
+
       });
     } else {
       // Multi-select: toggle the selected state
@@ -288,7 +290,7 @@ export class AppComponent extends SxcAppComponent {
       packages: templateApp,
     };
     window.parent.postMessage(JSON.stringify(message), "*");
-    console.log("createAppWithOrWithoutTemplate", hasTemplate, templateApp);
+    console.log("createAppWithOrWithoutTemplate", templateApp);
   }
 
 }

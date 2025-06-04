@@ -24,8 +24,6 @@
     <app-button-installer [selectedApps]="selectedApps" (installSelectedApps)="postSelectedAppsToParent()"
       [unselectedAppsCount]="numAppsToUnselect" [selectableAppsCount]="numAppsToSelect"
       (selectionToggled)="toggleAllAppsSelection($event)" />
-    } @else {
-    <app-button-template [selectTemplate]="selectedApps" (createNewApp)="createAppWithOrWithoutTemplate($event)" />
     }
 
     <!-- Search -->
