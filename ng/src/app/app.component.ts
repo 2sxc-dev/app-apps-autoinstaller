@@ -278,11 +278,17 @@ export class AppComponent extends SxcAppComponent {
 
   // Handler for creating an app with/without template (informational/logging)
   createAppWithOrWithoutTemplate(hasTemplate: boolean) {
-    const templateApps = this.selectedApps.map(data => ({
+    const templateApp = this.selectedApps.map(data => ({
       displayName: data.displayName,
       url: data.downloadUrl,
     }));
-    console.log("createAppWithOrWithoutTemplate", hasTemplate, templateApps);
+    const message = {
+      action: "template",
+      moduleId: this.moduleId,
+      packages: templateApp,
+    };
+    window.parent.postMessage(JSON.stringify(message), "*");
+    console.log("createAppWithOrWithoutTemplate", hasTemplate, templateApp);
   }
 
 }
