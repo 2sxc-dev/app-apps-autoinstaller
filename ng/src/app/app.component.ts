@@ -15,9 +15,9 @@ import { FormControl, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { environment } from "../environments/environment";
 import { HeaderComponent } from "./header/header.component";
 import { ButtonInstallerComponent } from "./button-installer/button-installer.component";
-import { ButtonTemplateComponent } from "./button-template/button-template.component";
 import { MatIconModule } from "@angular/material/icon";
 import { AsyncPipe } from "@angular/common";
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 // Define enum for switching between tile and list view modes
 enum ViewModes {
@@ -37,9 +37,12 @@ enum ViewModes {
     AsyncPipe,
     ReactiveFormsModule,
     FormsModule,
+    MatTooltipModule
   ],
 })
 export class AppComponent extends SxcAppComponent {
+
+  versionInfo = "2sxc App Installer v1.0.0"; 
   // For template use - expose enum
   ViewModes = ViewModes;
   // Base URL for API calls or navigation
