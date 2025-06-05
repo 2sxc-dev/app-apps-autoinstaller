@@ -111,8 +111,9 @@ export class AppComponent extends SxcAppComponent {
     this.hasUrlParams =
       this.params.has("sysversion") &&
       this.params.has("sxcversion") &&
-      this.params.has("2SexyContentVersion");
-    this.isTemplateMode = this.params.has("isTemplate");
+      this.params.has("2SexyContentVersion")
+
+    this.isTemplateMode = this.params.get("isTemplate") === 'true';
   }
 
   // Listen to search field and update searchTerm$ state, debounced
