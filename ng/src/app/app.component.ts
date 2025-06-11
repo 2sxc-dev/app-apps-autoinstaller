@@ -17,7 +17,7 @@ import { HeaderComponent } from "./header/header.component";
 import { ButtonInstallerComponent } from "./button-installer/button-installer.component";
 import { MatIconModule } from "@angular/material/icon";
 import { AsyncPipe } from "@angular/common";
-import {MatTooltipModule} from '@angular/material/tooltip';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 // Define enum for switching between tile and list view modes
 enum ViewModes {
@@ -42,7 +42,7 @@ enum ViewModes {
 })
 export class AppComponent extends SxcAppComponent {
 
-  versionInfo = "2sxc App Installer v1.0.0"; 
+  versionInfo = "2sxc App Installer v1.0.0";
   // For template use - expose enum
   ViewModes = ViewModes;
   // Base URL for API calls or navigation
@@ -73,7 +73,7 @@ export class AppComponent extends SxcAppComponent {
   isTemplateMode = false;
 
   // Title for "recommended apps" section
-  recommendedAppsTitle: string = "Recommended Apps for";
+  sxcversion: string = this.params.get("sxcversion");
 
   constructor(
     el: ElementRef,
@@ -115,6 +115,8 @@ export class AppComponent extends SxcAppComponent {
       this.params.has("sysversion") &&
       this.params.has("sxcversion") &&
       this.params.has("2SexyContentVersion")
+
+    console.log(this.params.get("sxcversion"))
 
     this.isTemplateMode = this.params.get("isTemplate") === 'true';
   }
@@ -173,7 +175,6 @@ export class AppComponent extends SxcAppComponent {
   // Apply allow/forbid/optional rules to apps from backend
   private applyRulesToApps(apps: App[], rules: Rules[]): App[] {
     if (apps.length === 0) return [];
-    this.recommendedAppsTitle = "Recommended Apps for";
     // If all apps are forbidden, only show those explicitly allowed
     const allForbidden = rules.some(rule =>
       rule.mode === "f" && rule.target === "all"

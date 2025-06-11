@@ -10,40 +10,57 @@
       @if (!isTemplateMode) {
       <app-header title="Let's auto-install some popular apps"
         description="Don't worry: if you don't like one, you can remove it later without side-effects :)"
-        [strongText]="recommendedAppsTitle" />
+        [strongText]="`Recommended Apps for 2sxc: ${sxcversion}`" />
       } @else {
       <app-header title="Let's create an App with a Template"
-        description="Don't worry: You can remove unused logic later" strongText="Recommended Template for:" />
+        description="Don't worry: You can remove unused logic later"
+        [strongText]="`Recommended Template for 2sxc: ${sxcversion}`" />
       }
     </div>
   </div>
 
   <!-- Buttons & Search Input -->
-  <div class="d-flex flex-column flex-lg-row mb-3 w-100">
-    @if (!isTemplateMode) {
-    <app-button-installer [selectedApps]="selectedApps" (installSelectedApps)="postSelectedAppsToParent()"
-      [unselectedAppsCount]="numAppsToUnselect" [selectableAppsCount]="numAppsToSelect"
-      (selectionToggled)="toggleAllAppsSelection($event)" />
-    }
+  <div class="container-fluid p-0">
+    <!-- Main wrapper -->
+    <div class="row mb-3">
+      <!-- Installer button (takes full width on mobile, col-lg-auto on desktop) -->
+      @if (!isTemplateMode) {
+      <div class="col-12 col-lg-auto mb-2 mb-lg-0">
+        <app-button-installer [selectedApps]="selectedApps" (installSelectedApps)="postSelectedAppsToParent()"
+          [unselectedAppsCount]="numAppsToUnselect" [selectableAppsCount]="numAppsToSelect"
+          (selectionToggled)="toggleAllAppsSelection($event)" />
+      </div>
+      }
 
-    <!-- Search -->
-    <div class="ms-0 ms-lg-3 mb-2">
-      <input class="form-control" [formControl]="searchControl" type="search" placeholder="Search..." />
-    </div>
+      <!-- Search and view toggle wrapper - always side-by-side -->
+      <div class="col-12 col-lg d-flex align-items-center">
+        <!-- Search takes most of the space -->
+        <div class="flex-grow-1 me-2">
+          <input class="form-control" [formControl]="searchControl" type="search" placeholder="Search..." />
+        </div>
 
-    <!-- View toggle buttons -->
-    <div class="view-toggle ms-auto">
-      <mat-icon (click)="changeViewMode(ViewModes.Tiles)">grid_on</mat-icon>
-      <mat-icon (click)="changeViewMode(ViewModes.List)">list</mat-icon>
+        <!-- View toggle buttons - always next to search -->
+        <div class="view-toggle d-flex align-items-center">
+          <mat-icon class="me-2 cursor-pointer" (click)="changeViewMode(ViewModes.Tiles)">grid_on</mat-icon>
+          <mat-icon class="cursor-pointer" (click)="changeViewMode(ViewModes.List)">list</mat-icon>
+        </div>
+      </div>
     </div>
   </div>
 
-  <p>In case you're wondering, we'll install the following apps:</p>
+
+  @if (!isTemplateMode) {
+  <p>You can install these apps on your system. Installed apps will no longer visible in the section.</p>
+  }
 
   <!-- Error: No apps for this version -->
   @if ((filteredApps$ | async)?.length === 0) {
   <div class="alert alert-danger" role="alert">
+    @if (!isTemplateMode) {
     ERROR: There is no app for this version.
+    } @else {
+    ERROR: There is no template for this version.
+    }
   </div>
   }
 
@@ -123,9 +140,12 @@
   <!-- Outro -->
   <div class="row">
     <p>
-      This dialog will disappear when you've added or created your first app. It
-      will appear again on every new portal, as the apps are per portal. If you
-      want to add more apps later on, just get them from the
+      @if (!isTemplateMode) {
+      You can reuse this dialog later when adding apps. If you would like to learn more about the apps, please open the
+      } @else {
+      You can use this dialog for each newly created app and utilize the template. If you would like to learn more about
+      the template, please refer to the
+      }
       <a [href]="baseUrl + '/apps'" target="_blank">app catalog</a>.
       <mat-icon class="material-icons-outlined small-icon mt-3" [matTooltip]="versionInfo" matTooltipPosition="below"
         aria-label="Info-Icon mit Tooltip">

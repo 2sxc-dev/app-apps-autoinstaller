@@ -1,21 +1,25 @@
-<div class="d-flex">
-  <!--  Download Button -->
-  <div class="mb-2 ">
-    <button [disabled]="selectedApps()?.length == 0" type="button" class="btn btn-darkblue text-nowrap"
+<!-- Main container - flex column on XS, row on SM+ -->
+<div class="d-flex flex-column flex-sm-row">
+  <!--  Download Button - full width on mobile -->
+  <div class="w-100 mb-2 mb-sm-0">
+    <button [disabled]="selectedApps()?.length == 0" type="button" class="btn btn-darkblue text-nowrap w-100"
       (click)="onInstallClicked()">
       <span>Install selected {{ selectedApps()?.length }} apps</span>
     </button>
   </div>
-  <!-- Unselect Button -->
-  <div class="ms-3 mb-2">
-    <button type="button" class="btn btn-secondary btn-select-toggle" [disabled]="unselectedAppsCount() == 0"
-      (click)="onSelectionToggle(false)">
+
+  <!-- Unselect/Select button container - always side by side -->
+  <div class="d-flex ms-0 ms-sm-3 w-100">
+    <!-- Unselect Button -->
+    <button type="button" class="btn btn-secondary btn-select-toggle flex-grow-1"
+      [disabled]="unselectedAppsCount() == 0" (click)="onSelectionToggle(false)">
       Unselect {{ unselectedAppsCount() }}
     </button>
+
     <!-- Select Button -->
-    <button type="button" class="btn btn-secondary btn-select-toggle ms-3" [disabled]="selectableAppsCount () == 0"
-      (click)="onSelectionToggle(true)">
-      Select {{ selectableAppsCount () }}
+    <button type="button" class="btn btn-secondary btn-select-toggle ms-3 flex-grow-1"
+      [disabled]="selectableAppsCount() == 0" (click)="onSelectionToggle(true)">
+      Select {{ selectableAppsCount() }}
     </button>
   </div>
 </div>
