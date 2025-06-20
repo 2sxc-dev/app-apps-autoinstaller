@@ -269,7 +269,6 @@ export class AppComponent extends SxcAppComponent {
       displayName: data.displayName,
       url: data.downloadUrl,
     }));
-    console.log("createAppWithOrWithoutTemplate", appsToInstall);
     const message = {
       action: "install",
       moduleId: this.moduleId,
