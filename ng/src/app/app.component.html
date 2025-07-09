@@ -80,14 +80,14 @@
       <div class="card bg-light">
         <div class="row g-0 position-relative app-view-item" (click)="onAppCheckboxToggle($event.target.tagName, app)">
           <div class="col-md-4">
-            <img [src]="baseUrl + '/' + app.icon + '?w=800'" class="img-fluid rounded-start align-items-center"
+            <img [src]="app.icon + '?w=800'" class="img-fluid rounded-start align-items-center"
               [alt]="app.displayName" />
           </div>
           <div class="col-md-8">
             <div class="card-body py-3 py-md-0 d-flex flex-column h-100 justify-content-center">
               <div>
                 <a class="title-hover vertical-middle mb-1" target="_blank"
-                  [href]="baseUrl + '/apps/details/app/' + app.urlKey">
+                  [href]="'/apps/details/app/' + app.urlKey">
                   <h5 class="fs-6 card-title mb-0">{{ app.displayName }}</h5>
                   <mat-icon class="arrow-icon">north_east</mat-icon>
                 </a>
@@ -111,12 +111,12 @@
     @for (app of apps; track app.guid) {
     <div class="d-flex align-items-center p-2 app-view-list w-100" (click)="onAppCheckboxToggle($event, app)">
       <div class="d-flex align-items-center">
-        <img [src]="baseUrl + '/' + app.icon + '?w=50'" class="img-fluid rounded-start align-items-center min-w-50"
+        <img [src]="app.icon + '?w=50'" class="img-fluid rounded-start align-items-center min-w-50"
           [alt]="app.displayName" />
       </div>
       <div class="d-flex flex-column ps-3 app-view-list-item">
         <div>
-          <a target="_blank" [href]="baseUrl + '/apps/details/app/' + app.urlKey" class="title-hover align-middle mb-1">
+          <a target="_blank" [href]="'/apps/details/app/' + app.urlKey" class="title-hover align-middle mb-1">
             <h5 class="fs-6 mb-0">{{ app.displayName }}</h5>
             <mat-icon class="arrow-icon">north_east</mat-icon>
           </a>
@@ -146,7 +146,7 @@
       You can use this dialog for each newly created app and utilize the template. If you would like to learn more about
       the template, please refer to the
       }
-      <a [href]="baseUrl + '/apps'" target="_blank">app catalog</a>.
+      <a [href]="'/apps'" target="_blank">app catalog</a>.
       <mat-icon class="material-icons-outlined small-icon mt-3" [matTooltip]="versionInfo" matTooltipPosition="below"
         aria-label="Info-Icon mit Tooltip">
         info

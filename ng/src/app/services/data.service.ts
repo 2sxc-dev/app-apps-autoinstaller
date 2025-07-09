@@ -17,7 +17,7 @@ export class DataService {
     query: string = "AutoInstaller"
   ): any {
     const edition = this.sxcContext.apiEdition;
-    const url = `${environment.baseUrl}/en/api/2sxc/app/App-Installer/${edition}/api/AppListData/GetListOfData?QueryName=${query}&ModuleId=${moduleId}&SexyContentVersion=${sexyContentVersion}&platform=Dnn&sysversion=${sysversion}&sxcversion=${sxcVersion}`;
+    const url = `/en/api/2sxc/app/App-Installer/${edition}/api/AppListData/GetListOfData?QueryName=${query}&ModuleId=${moduleId}&SexyContentVersion=${sexyContentVersion}&platform=Dnn&sysversion=${sysversion}&sxcversion=${sxcVersion}`;
     return this.http.get(url).pipe(share());
   }
 
