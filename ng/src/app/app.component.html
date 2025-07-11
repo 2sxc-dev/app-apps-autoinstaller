@@ -77,36 +77,48 @@
   <div class="row mb-2">
     @for (app of apps; track app.guid) {
     <div class="col-12 col-sm-4 col-md-4 col-lg-3 col-xxl-2 mb-3 app-view-tiles">
-      <div class="card bg-light">
-        <div class="row g-0 position-relative app-view-item" (click)="onAppCheckboxToggle($event.target.tagName, app)">
-          <div class="col-md-4">
-            <img [src]="app.icon + '?w=800'" class="img-fluid rounded-start align-items-center"
-              [alt]="app.displayName" />
+      <div class="card bg-light h-100">
+        <div class="row g-0 position-relative app-view-item h-100"
+          (click)="onAppCheckboxToggle($event.target.tagName, app)">
+
+          <!-- Bild links -->
+          <div class="col-md-4 d-flex align-items-md-center align-items-start">
+            <img [src]="app.icon + '?w=800'" class="img-fluid rounded-start" [alt]="app.displayName" />
           </div>
-          <div class="col-md-8">
-            <div class="card-body py-3 py-md-0 d-flex flex-column h-100 justify-content-center">
-              <div>
-                <a class="title-hover vertical-middle mb-1" target="_blank" [href]="'/apps/details/app/' + app.urlKey">
-                  <h5 class="fs-6 card-title mb-0">{{ app.displayName }}</h5>
-                  <mat-icon class="arrow-icon">north_east</mat-icon>
+
+          <!-- Inhalt rechts -->
+          <div class="col-md-8 d-flex flex-column">
+            <div class="card-body d-flex flex-column justify-content-between h-100 py-3 py-md-2">
+
+              <!-- Titelbereich – nimmt alle freie Höhe -->
+              <div >
+                <a class="title-hover vertical-middle mb-1 d-flex" target="_blank"
+                  [href]="'/apps/details/app/' + app.urlKey">
+                  <h5 class="fs-6 card-title mb-0 text-truncate-multiline flex-grow-1">{{ app.displayName }}</h5>
+                  <mat-icon class="arrow-icon ms-1">north_east</mat-icon>
                 </a>
               </div>
-              <div class="card-text">
+
+              <!-- Unten: Version + Checkbox -->
+              <div class="d-flex justify-content-between align-items-center pt-2">
                 <a class="version-link version-hover" [href]="app.gitHubRelease" target="_blank">
                   {{ app.version }}
                   <mat-icon class="zip-icon">folder_zip</mat-icon>
                 </a>
                 @if(!isTemplateMode) {
-                <input class="checkbox-item check-size" type="checkbox" [checked]="app.isSelected" readonly />
+                <input class="check-size" type="checkbox" [checked]="app.isSelected" readonly />
                 } @else {
-                <input class="checkbox-item check-size" type="radio" [checked]="app.isSelected" readonly />
+                <input class="check-size" type="radio" [checked]="app.isSelected" readonly />
                 }
               </div>
+
             </div>
           </div>
+
         </div>
       </div>
     </div>
+
     }
   </div>
   } @else {
@@ -133,9 +145,9 @@
       </div>
       <div class="ms-auto">
         @if(!isTemplateMode) {
-        <input class="checkbox-item check-size" type="checkbox" [checked]="app.isSelected" readonly />
+        <input class="check-size" type="checkbox" [checked]="app.isSelected" readonly />
         } @else {
-        <input class="checkbox-item check-size" type="radio" [checked]="app.isSelected" readonly />
+        <input class="check-size" type="radio" [checked]="app.isSelected" readonly />
         }
       </div>
     </div>

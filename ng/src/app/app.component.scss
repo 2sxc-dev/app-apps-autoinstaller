@@ -30,16 +30,6 @@ $customPrimaryColor: #022f5a;
     }
   }
 
-  .card-text {
-    margin: 0;
-  }
-
-  .checkbox-item {
-    position: absolute;
-    bottom: 8px;
-    right: 8px;
-  }
-
   .version-link {
     z-index: 2;
     position: relative;
@@ -90,7 +80,7 @@ $customPrimaryColor: #022f5a;
   width: 20px;
   height: 20px;
   cursor: pointer;
-  display: block;
+  // display: block;
 }
 
 a {
@@ -101,9 +91,13 @@ a {
 h5 {
   overflow: hidden;
   text-overflow: ellipsis;
-  display: inline-block;
-  white-space: nowrap;
+  // display: inline-block;
+  // white-space: nowrap;
   max-width: 100%;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; /* optional als Fallback */
 }
 
 img {
