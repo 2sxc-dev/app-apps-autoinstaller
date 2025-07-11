@@ -1,9 +1,9 @@
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
 @import "bootstrap/scss/mixins";
+@import "../styles";
 
-
-$darkblue: #022f5a;
+$customPrimaryColor: #022f5a;
 
 // app-view-tiles
 .app-view-tiles {
@@ -85,21 +85,6 @@ $darkblue: #022f5a;
   }
 }
 
-.btn-darkblue {
-  background-color: $darkblue;
-  color: white;
-  width: 200px;
-  transition: all 225ms ease-in-out;
-  &:hover {
-    background-color: lighten($darkblue, 5);
-    color: white;
-  }
-}
-
-.btn-select-toggle {
-  width: 120px;
-}
-
 // general  classes
 .check-size {
   width: 20px;
@@ -109,7 +94,7 @@ $darkblue: #022f5a;
 }
 
 a {
-  color: $darkblue;
+  color: $customPrimaryColor;
   text-decoration: none;
 }
 
@@ -130,14 +115,15 @@ img {
 }
 
 input {
-  accent-color: $darkblue;
+  accent-color: $sxc-solid !important;
+  color: white;
 }
 
 .title-hover {
   &:hover {
     .arrow-icon {
       display: inline-block;
-      color: $darkblue;
+      color: $customPrimaryColor;
     }
   }
 }
@@ -151,7 +137,7 @@ input {
   &:hover {
     .zip-icon {
       display: inline-block;
-      color: $darkblue;
+      color: $customPrimaryColor;
     }
   }
 }
@@ -171,15 +157,6 @@ input {
   }
 }
 
-@include media-breakpoint-down(lg) {
-  .btn-darkblue {
-    width: 100%;
-  }
-  .btn-select-toggle {
-    width: calc(50% - (1rem / 2));
-  }
-}
-
 // to hide the header and footer
 ::ng-deep #to-shine-page-navigation {
   display: none !important;
@@ -189,8 +166,7 @@ input {
   display: none !important;
 }
 
-
 .small-icon {
-  font-size: 8px; 
-  vertical-align: middle; 
+  font-size: 8px;
+  vertical-align: middle;
 }

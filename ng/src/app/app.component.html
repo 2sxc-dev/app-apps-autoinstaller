@@ -86,8 +86,7 @@
           <div class="col-md-8">
             <div class="card-body py-3 py-md-0 d-flex flex-column h-100 justify-content-center">
               <div>
-                <a class="title-hover vertical-middle mb-1" target="_blank"
-                  [href]="'/apps/details/app/' + app.urlKey">
+                <a class="title-hover vertical-middle mb-1" target="_blank" [href]="'/apps/details/app/' + app.urlKey">
                   <h5 class="fs-6 card-title mb-0">{{ app.displayName }}</h5>
                   <mat-icon class="arrow-icon">north_east</mat-icon>
                 </a>
@@ -97,7 +96,11 @@
                   {{ app.version }}
                   <mat-icon class="zip-icon">folder_zip</mat-icon>
                 </a>
+                @if(!isTemplateMode) {
                 <input class="checkbox-item check-size" type="checkbox" [checked]="app.isSelected" readonly />
+                } @else {
+                <input class="checkbox-item check-size" type="radio" [checked]="app.isSelected" readonly />
+                }
               </div>
             </div>
           </div>
@@ -129,7 +132,11 @@
         </div>
       </div>
       <div class="ms-auto">
-        <input class="check-size" type="checkbox" [checked]="app.isSelected" readonly />
+        @if(!isTemplateMode) {
+        <input class="checkbox-item check-size" type="checkbox" [checked]="app.isSelected" readonly />
+        } @else {
+        <input class="checkbox-item check-size" type="radio" [checked]="app.isSelected" readonly />
+        }
       </div>
     </div>
     }

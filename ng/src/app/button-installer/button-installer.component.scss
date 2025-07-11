@@ -1,17 +1,23 @@
 
-$darkblue: #022f5a;
-
-.btn-darkblue {
-  background-color: $darkblue;
-  color: white;
-  width: 200px;
-  transition: all 225ms ease-in-out;
-  &:hover {
-    background-color: lighten($darkblue, 5);
-    color: white;
-  }
-}
+@import "../../styles";
 
 .btn-select-toggle {
   width: 120px;
+}
+
+.custom-install-button {
+  background: $sxc-gradient !important;
+  color: white !important;
+  border-radius: 4px;
+  width: 200px;
+  transition: all 225ms ease-in-out;
+
+  &:hover {
+     background: $sxc-gradient-hover !important;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 }

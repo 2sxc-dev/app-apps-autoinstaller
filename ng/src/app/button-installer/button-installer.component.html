@@ -2,11 +2,20 @@
 <div class="d-flex flex-column flex-sm-row">
   <!--  Download Button - full width on mobile -->
   <div class="w-100 mb-2 mb-sm-0">
-    <button [disabled]="selectedApps()?.length == 0" type="button" class="btn btn-darkblue text-nowrap w-100"
+    <!-- <button [disabled]="selectedApps()?.length == 0" type="button" class="btn btn-selected text-nowrap w-100"
       (click)="onInstallClicked()">
       <span>Install selected {{ selectedApps()?.length }} apps</span>
+    </button> -->
+
+
+    <button mat-raised-button color="primary" [disabled]="selectedApps()?.length === 0" (click)="onInstallClicked()"
+      class="custom-install-button w-100">
+      Install selected {{ selectedApps()?.length }} apps
     </button>
+
   </div>
+
+
 
   <!-- Unselect/Select button container - always side by side -->
   <div class="d-flex ms-0 ms-sm-3 w-100">

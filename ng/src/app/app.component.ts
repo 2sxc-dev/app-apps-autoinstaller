@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener } from "@angular/core";
 import { SxcAppComponent, Context } from "@2sic.com/sxc-angular";
-import { App, Rules, Selected } from "./app-interface";
+import { App, Rules } from "./app-interface";
 import {
   BehaviorSubject,
   combineLatestWith,
@@ -37,7 +37,7 @@ enum ViewModes {
     AsyncPipe,
     ReactiveFormsModule,
     FormsModule,
-    MatTooltipModule
+    MatTooltipModule,
   ],
 })
 export class AppComponent extends SxcAppComponent {

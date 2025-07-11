@@ -1,3 +1,20 @@
+// 2sxc Color: 
+
+$sxc-gradient: linear-gradient(
+  125deg,
+  rgba(36, 14, 18, 1) 10%,
+  /* #240E12 */ rgba(149, 44, 66, 1) 90% /* #952C42 */
+);
+
+$sxc-gradient-hover: linear-gradient(
+  125deg,
+  rgba(66, 44, 48, 1) 10%, // heller als 36,14,18
+  rgba(179, 74, 96, 1) 90% // heller als 149,44,66
+);
+
+$sxc-solid: #813746;
+
+
 ::ng-deep #to-shine-page-navigation {
   display: none !important;
 }
