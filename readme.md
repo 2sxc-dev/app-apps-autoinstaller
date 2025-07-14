@@ -21,20 +21,29 @@ The solution in as **2sxc App** and can be installed from 2sxc (inside DNN). Fol
 * Dnn-Sxc-Angular [npm](https://www.npmjs.com/package/@2sic.com/dnn-sxc-angular)
 * Documentation [recipes & instructions on azing](https://azing.org/2sxc/l/VPE4Usua/angular-apps-development)
 
-
 ## History
 
 * 2020-11-09
-    * Updated shared code which extracts the generated index.html for DNN
-* 2021-02-25 
-    * Improved razor code split
-    * Using latest (v11) dnn-sxc-angular
-    * Split examples into sub-module to make it easy to remove them
-    * Extensive documentation of everything inside this
-    * Edit-toolbars in the application
-    * After edit a callback refreshes the data (instead of page reload)
-    * Made data multi-language (English and German)
+  * Updated shared code which extracts the generated index.html for DNN
+* 2021-02-25
+  * Improved razor code split
+  * Using latest (v11) dnn-sxc-angular
+  * Split examples into sub-module to make it easy to remove them
+  * Extensive documentation of everything inside this
+  * Edit-toolbars in the application
+  * After edit a callback refreshes the data (instead of page reload)
+  * Made data multi-language (English and German)
 * 2022-07-08
-    * Migration to Angular 14
-    * dnn-sxc-angular replaced by new sxc-angular lib (v14.07.01)
-    * Using latest (v14.07.03) 2sxc-typings
+  * Migration to Angular 14
+  * dnn-sxc-angular replaced by new sxc-angular lib (v14.07.01)
+  * Using latest (v14.07.03) 2sxc-typings
+
+* v01.01.03 2025-07-14
+  * Add new Version Icon
+  * Change Color to 2sxc Color
+  * Add Template and App Installer
+  * Template App select Only one, use Radio Button
+  * Change Button to Material Button
+  * Fix Style issue
+
+  

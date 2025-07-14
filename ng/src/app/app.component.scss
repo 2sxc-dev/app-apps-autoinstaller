@@ -3,8 +3,6 @@
 @import "bootstrap/scss/mixins";
 @import "../styles";
 
-$customPrimaryColor: #022f5a;
-
 // app-view-tiles
 .app-view-tiles {
   .app-view-item {
@@ -56,14 +54,6 @@ $customPrimaryColor: #022f5a;
     background-color: lightgray;
   }
 
-  a {
-    &:hover {
-      h5 {
-        max-width: calc(100% - 20px);
-      }
-    }
-  }
-
   .app-view-list-item {
     width: calc(100% - 80px);
   }
@@ -80,19 +70,24 @@ $customPrimaryColor: #022f5a;
   width: 20px;
   height: 20px;
   cursor: pointer;
-  // display: block;
+}
+
+.box-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 a {
-  color: $customPrimaryColor;
+  color: $sxc-solid;
   text-decoration: none;
+
+  &:hover {
+    color: lighten($sxc-solid, 15%);
+  }
 }
 
 h5 {
   overflow: hidden;
   text-overflow: ellipsis;
-  // display: inline-block;
-  // white-space: nowrap;
   max-width: 100%;
 
   display: -webkit-box;
@@ -117,7 +112,7 @@ input {
   &:hover {
     .arrow-icon {
       display: inline-block;
-      color: $customPrimaryColor;
+      color: $sxc-solid;
     }
   }
 }
@@ -131,7 +126,7 @@ input {
   &:hover {
     .zip-icon {
       display: inline-block;
-      color: $customPrimaryColor;
+      color: $sxc-solid;
     }
   }
 }
