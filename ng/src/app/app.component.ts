@@ -71,6 +71,7 @@ export class AppComponent extends SxcAppComponent {
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
   isTemplateMode = false;
+  selectOnlyOneApp = false; // For template mode, only one app can be selected
 
   // Title for "recommended apps" section
   sxcversion: string = this.params.get("sxcversion");
@@ -116,9 +117,8 @@ export class AppComponent extends SxcAppComponent {
       this.params.has("sxcversion") &&
       this.params.has("2SexyContentVersion")
 
-    console.log(this.params.get("sxcversion"))
-
     this.isTemplateMode = this.params.get("isTemplate") === 'true';
+    this.selectOnlyOneApp = this.params.get("selectOnlyMode") === 'true' || this.isTemplateMode;
   }
 
   // Listen to search field and update searchTerm$ state, debounced
@@ -157,7 +157,7 @@ export class AppComponent extends SxcAppComponent {
         const filteredApps = this.filterAppsBySearch(apps, searchTerm);
 
         // Template mode: only one app can be selected at a time (radio behavior)
-        if (this.isTemplateMode) {
+        if (this.selectOnlyOneApp) {
           let selectedKey = selectedApp && selectedApp.urlKey ? selectedApp.urlKey : null;
           filteredApps.forEach(app => app.isSelected = (app.urlKey === selectedKey));
         }

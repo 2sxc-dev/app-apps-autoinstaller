@@ -24,7 +24,7 @@
     <!-- Main wrapper -->
     <div class="row mb-3">
       <!-- Installer button (takes full width on mobile, col-lg-auto on desktop) -->
-      @if (!isTemplateMode) {
+      @if (!selectOnlyOneApp) {
       <div class="col-12 col-lg-auto mb-2 mb-lg-0">
         <app-button-installer [selectedApps]="selectedApps" (installSelectedApps)="postSelectedAppsToParent()"
           [unselectedAppsCount]="numAppsToUnselect" [selectableAppsCount]="numAppsToSelect"
@@ -104,7 +104,7 @@
                   {{ app.version }}
                   <mat-icon class="zip-icon">folder_zip</mat-icon>
                 </a>
-                @if(!isTemplateMode) {
+                @if(!selectOnlyOneApp) {
                 <input class="check-size" type="checkbox" [checked]="app.isSelected" readonly />
                 } @else {
                 <input class="check-size" type="radio" [checked]="app.isSelected" readonly />
@@ -142,7 +142,7 @@
         </div>
       </div>
       <div class="ms-auto">
-        @if(!isTemplateMode) {
+        @if(!selectOnlyOneApp) {
         <input class="check-size" type="checkbox" [checked]="app.isSelected" readonly />
         } @else {
         <input class="check-size" type="radio" [checked]="app.isSelected" readonly />
