@@ -78,11 +78,11 @@
     @for (app of apps; track app.guid) {
     <div class="col-12 col-sm-4 col-md-4 col-xl-3 col-xxl-2 mb-3 app-view-tiles">
       <div class="card bg-light h-100 box-shadow">
-        <div class="row g-0 position-relative app-view-item " (click)="onAppCheckboxToggle($event.target.tagName, app)">
+        <div class="row g-0 position-relative app-view-item h-100" (click)="onAppCheckboxToggle($event.target.tagName, app)">
 
           <!-- Image -->
-          <div class="col-md-4 d-flex align-items-md-center align-items-start">
-            <img [src]="app.icon + '?w=800'" class="img-fluid rounded-start" [alt]="app.displayName" />
+          <div class="col-md-4 d-flex align-items-start">
+            <img [src]="app.icon + '?w=800'" class="img-fluid rounded-start object-fit-cover" [alt]="app.displayName" />
           </div>
 
           <!-- Content -->
