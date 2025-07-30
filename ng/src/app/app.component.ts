@@ -42,7 +42,7 @@ enum ViewModes {
 })
 export class AppComponent extends SxcAppComponent {
 
-  versionInfo = "2sxc App Installer v01.00.02";
+  versionInfo = "2sxc App Installer v01.01.04";
   // For template use - expose enum
   ViewModes = ViewModes;
   // Base URL for API calls or navigation
@@ -174,6 +174,7 @@ export class AppComponent extends SxcAppComponent {
 
   // Apply allow/forbid/optional rules to apps from backend
   private applyRulesToApps(apps: App[], rules: Rules[]): App[] {
+
     if (apps.length === 0) return [];
     // If all apps are forbidden, only show those explicitly allowed
     const allForbidden = rules.some(rule =>
@@ -190,13 +191,20 @@ export class AppComponent extends SxcAppComponent {
       return allowed.length > 0 ? allowed : [];
     }
     // Otherwise: exclude forbidden, select all not-optional by default
-    const forbiddenApps = apps.filter(app =>
-      rules.some(rule =>
-        rule.mode === "f" &&
-        rule.target === "guid" &&
-        rule.appGuid === app.guid
-      )
-    );
+    // forbidden apps are installed app, if selectOnlyOneApp is true = install as template app 
+
+    let forbiddenApps: App[] = [];
+    if (!this.selectOnlyOneApp) {
+      // In template mode, only allow one app to be selected
+      forbiddenApps = apps.filter(app =>
+        rules.some(rule =>
+          rule.mode === "f" &&
+          rule.target === "guid" &&
+          rule.appGuid === app.guid
+        )
+      );
+    }
+
     const allowedApps = apps.filter(app => !forbiddenApps.includes(app));
     allowedApps.forEach(app => {
       const isOptional = rules.some(rule =>
@@ -294,7 +302,6 @@ export class AppComponent extends SxcAppComponent {
       packages: templateApp,
     };
     window.parent.postMessage(JSON.stringify(message), "*");
-    console.log("createAppWithOrWithoutTemplate", templateApp);
   }
 
 }
