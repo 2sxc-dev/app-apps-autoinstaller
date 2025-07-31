@@ -23,6 +23,9 @@ The solution in as **2sxc App** and can be installed from 2sxc (inside DNN). Fol
 
 ## History
 
+* v01.01.05 2025-07-31
+  * Add new button for select only one
+
 * v01.01.04 2025-07-30
   * Show all Apps, if selectOnlyOne true, for Template App
 

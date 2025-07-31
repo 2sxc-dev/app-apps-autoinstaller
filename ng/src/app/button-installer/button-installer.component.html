@@ -7,16 +7,16 @@
       <span>Install selected {{ selectedApps()?.length }} apps</span>
     </button> -->
 
-
     <button mat-raised-button color="primary" [disabled]="selectedApps()?.length === 0" (click)="onInstallClicked()"
       class="custom-install-button w-100">
+      @if(!selectOnlyOneApp()){
       Install selected {{ selectedApps()?.length }} apps
+      } @else {
+      Install selected app as Template}
     </button>
-
   </div>
 
-
-
+  @if(!selectOnlyOneApp()){
   <!-- Unselect/Select button container - always side by side -->
   <div class="d-flex ms-0 ms-sm-3 w-100">
     <!-- Unselect Button -->
@@ -31,4 +31,5 @@
       Select {{ selectableAppsCount() }}
     </button>
   </div>
+  }
 </div>

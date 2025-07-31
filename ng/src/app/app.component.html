@@ -24,9 +24,9 @@
     <!-- Main wrapper -->
     <div class="row mb-3">
       <!-- Installer button (takes full width on mobile, col-lg-auto on desktop) -->
-      @if (!selectOnlyOneApp) {
+      @if (!isTemplateMode) {
       <div class="col-12 col-lg-auto mb-2 mb-lg-0">
-        <app-button-installer [selectedApps]="selectedApps" (installSelectedApps)="postSelectedAppsToParent()"
+        <app-button-installer [selectedApps]="selectedApps" [selectOnlyOneApp]="selectOnlyOneApp" (installSelectedApps)="postSelectedAppsToParent()"
           [unselectedAppsCount]="numAppsToUnselect" [selectableAppsCount]="numAppsToSelect"
           (selectionToggled)="toggleAllAppsSelection($event)" />
       </div>

@@ -42,7 +42,7 @@ enum ViewModes {
 })
 export class AppComponent extends SxcAppComponent {
 
-  versionInfo = "2sxc App Installer v01.01.04";
+  versionInfo = "2sxc App Installer v01.01.05";
   // For template use - expose enum
   ViewModes = ViewModes;
   // Base URL for API calls or navigation

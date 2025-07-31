@@ -11,6 +11,7 @@ import {MatButtonModule} from '@angular/material/button';
 })
 export class ButtonInstallerComponent {
   selectedApps = input.required<App[]>();
+  selectOnlyOneApp = input.required<boolean>();
   unselectedAppsCount = input.required<number>();
   selectableAppsCount = input.required<number>();
 
