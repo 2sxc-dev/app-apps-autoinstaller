@@ -1,11 +1,11 @@
-import { Component, input, output } from '@angular/core';
-import { App } from '../app-interface';
-import {MatButtonModule} from '@angular/material/button';
+import { Component, input, output } from "@angular/core";
+import { App } from "../app-interface";
+import { MatButtonModule } from "@angular/material/button";
 
 @Component({
-  selector: 'app-button-installer',
-  templateUrl: './button-installer.component.html',
-  styleUrl: './button-installer.component.scss',
+  selector: "app-button-installer",
+  templateUrl: "./button-installer.component.html",
+  styleUrl: "./button-installer.component.scss",
   imports: [MatButtonModule],
   standalone: true,
 })
@@ -18,7 +18,6 @@ export class ButtonInstallerComponent {
   installSelectedApps = output<void>();
   selectionToggled = output<boolean>();
 
-
   onInstallClicked() {
     this.installSelectedApps.emit();
   }
@@ -26,6 +25,4 @@ export class ButtonInstallerComponent {
   onSelectionToggle(value: boolean) {
     this.selectionToggled.emit(value);
   }
-
 }
-

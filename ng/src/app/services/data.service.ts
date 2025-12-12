@@ -7,8 +7,8 @@ import { Context, SxcApp } from "@2sic.com/sxc-angular";
   providedIn: "root",
 })
 export class DataService {
-  constructor(private http: HttpClient, private sxcContext: Context) { }
-  // New Code 
+  constructor(private http: HttpClient, private sxcContext: Context) {}
+  // New Code
   getApps(
     sxcVersion: string,
     sysversion: string,
@@ -20,5 +20,4 @@ export class DataService {
     const url = `/en/api/2sxc/app/App-Installer/${edition}/api/AppListData/GetListOfData?QueryName=${query}&ModuleId=${moduleId}&SexyContentVersion=${sexyContentVersion}&platform=Dnn&sysversion=${sysversion}&sxcversion=${sxcVersion}`;
     return this.http.get(url).pipe(share());
   }
-
 }
