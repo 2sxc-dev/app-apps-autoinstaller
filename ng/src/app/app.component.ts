@@ -25,6 +25,12 @@ enum ViewModes {
   List = "list",
 }
 
+export enum AppViewMode {
+  Templates = "app-templates",
+  Extensions = "app-extensions",
+  Autoinstall = "app-autoinstall",
+}
+
 @Component({
   selector: "app-root",
   templateUrl: "./app.component.html",
@@ -69,7 +75,14 @@ export class AppComponent extends SxcAppComponent {
   params = new URLSearchParams(window.location.search);
   moduleId = this.params.get("ModuleId");
   hasUrlParams = true;
+
+  // NEW for App | Template | Extension
+  appViewMode: AppViewMode = AppViewMode.Autoinstall;
+  AppViewMode = AppViewMode;
+
+  // LEGACY
   isTemplateMode = false;
+
   selectOnlyOneApp = false; // For template mode, only one app can be selected
 
   // Title for "recommended apps" section
@@ -116,9 +129,28 @@ export class AppComponent extends SxcAppComponent {
       this.params.has("sxcversion") &&
       this.params.has("2SexyContentVersion");
 
+    // legacy
     this.isTemplateMode = this.params.get("isTemplate") === "true";
+
+    // new enum view
+    const viewParam = this.params.get("view") as AppViewMode | null;
+
+    if (
+      viewParam &&
+      Object.values(AppViewMode).includes(viewParam as AppViewMode)
+    ) {
+      this.appViewMode = viewParam as AppViewMode;
+    } else if (this.isTemplateMode) {
+      this.appViewMode = AppViewMode.Templates;
+    } else {
+      this.appViewMode = AppViewMode.Autoinstall;
+    }
+
     this.selectOnlyOneApp =
-      this.params.get("selectOnlyMode") === "true" || this.isTemplateMode;
+      this.appViewMode === AppViewMode.Templates ||
+      this.appViewMode === AppViewMode.Extensions ||
+      this.params.get("selectOnlyMode") === "true" ||
+      this.isTemplateMode;
   }
 
   // Listen to search field and update searchTerm$ state, debounced
@@ -132,10 +164,25 @@ export class AppComponent extends SxcAppComponent {
 
   // Get and filter apps from API, apply rules, emit as observable
   private setupFilteredAppsStream() {
-    const queryType = this.isTemplateMode ? "TemplateList" : "AutoInstaller";
+    // Templates and Apps use App-Installer
+    let queryType = "AutoInstaller"; // Default
+
+    if (this.appViewMode === AppViewMode.Templates) {
+      queryType = "TemplateList";
+    } // Extensions have own API call
+    else if (this.appViewMode === AppViewMode.Extensions) {
+      this.filteredApps$ = this.dataService.getExtensions().pipe(
+        combineLatestWith(this.sxcRules$),
+        map(([apps, rules]) => this.applyRulesToApps(apps, rules)),
+        shareReplay(1)
+      );
+      return;
+    }
+
     const sxcVersion = this.params.get("sxcversion");
     const sysVersion = this.params.get("sysversion");
     const sexyContentVersion = this.params.get("2SexyContentVersion");
+
     this.filteredApps$ = this.dataService
       .getApps(
         sxcVersion,
@@ -173,6 +220,7 @@ export class AppComponent extends SxcAppComponent {
           (app) => app.isSelected
         ).length;
         this.numAppsToSelect = filteredApps.length - this.numAppsToUnselect;
+
         return filteredApps;
       }),
       shareReplay(1)
@@ -214,6 +262,7 @@ export class AppComponent extends SxcAppComponent {
     }
 
     const allowedApps = apps.filter((app) => !forbiddenApps.includes(app));
+
     allowedApps.forEach((app) => {
       const isOptional = rules.some(
         (rule) =>
@@ -223,6 +272,7 @@ export class AppComponent extends SxcAppComponent {
       );
       app.isSelected = !isOptional;
     });
+
     allowedApps.sort((a, b) => a.displayName.localeCompare(b.displayName));
     return allowedApps;
   }
@@ -242,8 +292,8 @@ export class AppComponent extends SxcAppComponent {
    */
   onAppCheckboxToggle(tagName: string, app: App): void {
     if (tagName === "A" || tagName === "MAT-ICON") return;
-    if (this.isTemplateMode) {
-      // Radio behavior: only one app can be selected
+
+    if (this.selectOnlyOneApp) {
       this.filteredApps$.pipe(take(1)).subscribe((apps) => {
         const wasSelected = app.isSelected;
         apps.forEach((a) => (a.isSelected = false));

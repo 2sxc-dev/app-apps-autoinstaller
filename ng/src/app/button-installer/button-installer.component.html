@@ -14,11 +14,7 @@
       (click)="onInstallClicked()"
       class="custom-install-button w-100"
     >
-      @if(!selectOnlyOneApp()){
-        Install selected {{ selectedApps()?.length }} apps
-      } @else {
-        Install selected app as Template
-      }
+      {{ getInstallButtonText() }}
     </button>
   </div>
 
