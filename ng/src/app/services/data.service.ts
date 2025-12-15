@@ -33,11 +33,22 @@ export class DataService {
 
   // ✅ Extensions → AutoQuery
   getExtensions() {
-    const url =
-      `/api/2sxc/app/auto/query/Extensions`;
+    const url = `/api/2sxc/app/auto/query/Extensions`;
 
     return this.http.get<any>(url).pipe(
-      map((res) => res?.Default ?? []),
+      map((res) =>
+        (res?.Default ?? []).map((i) => ({
+          guid: i.AppGuid,
+          displayName: i.Title,
+          urlKey: i.UrlKey,
+          icon: i.Icon,
+          version: i.Releases?.[0]?.Title ?? "",
+          gitHub: i.Github,
+          gitHubRelease: i.Github,
+          downloadUrl: i.Github,
+          isSelected: false,
+        }))
+      ),
       share()
     );
   }
