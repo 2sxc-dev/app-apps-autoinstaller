@@ -19,6 +19,8 @@ import { MatIconModule } from "@angular/material/icon";
 import { AsyncPipe } from "@angular/common";
 import { MatTooltipModule } from "@angular/material/tooltip";
 
+const debug = false;
+
 // Define enum for switching between tile and list view modes
 enum ViewModes {
   Tiles = "tiles",
@@ -78,6 +80,8 @@ export class AppComponent extends SxcAppComponent {
 
   // NEW for App | Template | Extension
   appViewMode: AppViewMode = AppViewMode.Autoinstall;
+
+  // Provide enum to template
   AppViewMode = AppViewMode;
 
   // LEGACY
@@ -99,10 +103,13 @@ export class AppComponent extends SxcAppComponent {
   // Listen for postMessage events from parent window (for receiving rules)
   @HostListener("window:message", ["$event"])
   onPostMessage(event: MessageEvent) {
-    if (typeof event.data !== "string") return;
+    if (typeof event.data !== "string")
+      return;
     const message = JSON.parse(event.data);
     // Update rules if received from parent frame
     if (message.action === "specs" && message.data?.rules) {
+      if (debug)
+        console.log("Received specs from parent:", message.data.rules);
       this.sxcRules$.next(message.data.rules);
     }
   }
@@ -118,6 +125,7 @@ export class AppComponent extends SxcAppComponent {
 
   // Request rules/specs from parent window (iframe usage)
   private sendSpecsRequestToParent() {
+    if (debug) console.log("Requesting specs from parent...");
     const message = { action: "specs", moduleId: this.moduleId };
     window.parent.postMessage(JSON.stringify(message), "*");
   }
@@ -234,49 +242,60 @@ export class AppComponent extends SxcAppComponent {
 
   // Apply allow/forbid/optional rules to apps from backend
   private applyRulesToApps(apps: App[], rules: Rules[]): App[] {
-    if (apps.length === 0) return [];
+    if (debug)
+      console.log("Applying rules to apps:", apps, rules);
+    if (apps.length === 0)
+      return [];
     // If all apps are forbidden, only show those explicitly allowed
-    const allForbidden = rules.some(
-      (rule) => rule.mode === "f" && rule.target === "all"
-    );
+    const allForbidden = rules.some(r => r.mode === "f" && r.target === "all");
     if (allForbidden) {
+      if (debug) console.log("All apps forbidden, applying allow-list filtering.");
       const allowed = apps.filter((app) =>
-        rules.some(
-          (rule) =>
-            rule.mode === "a" &&
-            rule.target === "guid" &&
-            rule.appGuid === app.guid
+        rules.some(r =>
+          r.mode === "a" &&
+          r.target === "guid" &&
+          r.appGuid === app.guid
         )
       );
       return allowed.length > 0 ? allowed : [];
     }
+    
     // Otherwise: exclude forbidden, select all not-optional by default
     // forbidden apps are installed app, if selectOnlyOneApp is true = install as template app
-
     let forbiddenApps: App[] = [];
-    if (!this.selectOnlyOneApp) {
+    // Don't apply forbid rules in template mode - as the template can be installed multiple times
+    if (this.appViewMode != AppViewMode.Templates) {
+    // before 2025-12-16; remove 2026-Q1 if all ok
+    // if (!this.selectOnlyOneApp) {
+      if (debug)
+        console.log("Installer mode: applying standard forbid rules.");
       // In template mode, only allow one app to be selected
       forbiddenApps = apps.filter((app) =>
-        rules.some(
-          (rule) =>
-            rule.mode === "f" &&
-            rule.target === "guid" &&
-            rule.appGuid === app.guid
+        rules.some(r =>
+          r.mode === "f" &&
+          r.target === "guid" &&
+          r.appGuid === app.guid
         )
       );
+      if (debug)
+        console.log("Forbidden apps:", forbiddenApps);
     }
 
     const allowedApps = apps.filter((app) => !forbiddenApps.includes(app));
+    if (debug)
+      console.log("Allowed apps after applying rules:", allowedApps);
 
     allowedApps.forEach((app) => {
-      const isOptional = rules.some(
-        (rule) =>
-          rule.mode === "o" &&
-          rule.target === "guid" &&
-          rule.appGuid === app.guid
+      const isOptional = rules.some(r =>
+        r.mode === "o" &&
+        r.target === "guid" &&
+        r.appGuid === app.guid
       );
       app.isSelected = !isOptional;
     });
+
+    if (debug)
+      console.log("Setting isSelected for allowed apps based on optional rules.", allowedApps);
 
     allowedApps.sort((a, b) => a.displayName.localeCompare(b.displayName));
     return allowedApps;
