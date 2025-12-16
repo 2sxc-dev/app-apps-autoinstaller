@@ -24,8 +24,29 @@ using Newtonsoft.Json;
 // see https://docs.2sxc.org/web-api/custom/index.html
 public class AppListDataController : Custom.Hybrid.Api14 /*TODO: Custom.Hybrid.ApiTyped*/
 {
+  // Helper function to append a release item to the jsonToInstall string
+  private void AppendToJsonInstall(ref string jsonToInstall, dynamic release, dynamic item, string title)
+  {
+    var downloadUrl = release.Download;
+    jsonToInstall +=
+      "{ title:'" + title +
+        "', downloadUrl:'" + downloadUrl +
+        "', gitHubRelease:'" + release.Github +
+        "', displayName:'" + item.Name +
+        "', gitHub:'" + item.GitHub +
+        "', icon:'" + item.Icon +
+        "', urlKey:'" + item.Urlkey +
+        "', shortDescription:'" + item.ShortDescription +
+        "', version:'" + release.Version +
+        "', minDnn:'" + release.MinDnn +
+        "', min2Sxc:'" + release.Min2sxc +
+        "', minOqt:'" + release.MinOqt +
+        "', guid:'" + item.AppGuid +
+      "'},";
+  }
+
   [HttpGet]   // [HttpGet] says we're listening to GET requests
-  // TODO: AppDataDto     
+  // TODO: AppDataDto
   public dynamic GetListOfData(
     string QueryName,
     string ModuleId,
@@ -37,11 +58,9 @@ public class AppListDataController : Custom.Hybrid.Api14 /*TODO: Custom.Hybrid.A
     var platform = Platform;
     // if oqtane, it must use the current download in the files...
     var isOqtane = platform.Equals("Oqt", StringComparison.OrdinalIgnoreCase);
-    var platformVersion = SysVersion;
-    var requesting2sxcV = SxcVersion;
 
     // correct incomming version to ensure it's in the format ##.##.##
-    var v2sxc = new Version(requesting2sxcV);
+    var v2sxc = new Version(SxcVersion);
 
     var allInstalls = AsList(App.Query[QueryName]);
 
@@ -52,7 +71,6 @@ public class AppListDataController : Custom.Hybrid.Api14 /*TODO: Custom.Hybrid.A
 
     var applicableVersions = applicableFor2sxc
         .Where(ai => !string.IsNullOrEmpty(ai.MinDnnVersion));
-
 
     if (isOqtane)
       applicableVersions = applicableFor2sxc.Where(ai => !string.IsNullOrEmpty(ai.MinOqtVersion));
@@ -73,22 +91,45 @@ public class AppListDataController : Custom.Hybrid.Api14 /*TODO: Custom.Hybrid.A
 
       if (release != null)
       {
-        var downloadUrl = release.Download;
-        jsonToInstall +=
-          "{ title:'" + @title +
-            "', downloadUrl:'" + @downloadUrl +
-            "', gitHubRelease:'" + @release.Github +
-            "', displayName:'" + @item.Name +
-            "', gitHub:'" + @item.GitHub +
-            "', icon:'" + @item.Icon +
-            "', urlKey:'" + @item.Urlkey +
-            "', shortDescription:'" + @item.ShortDescription +
-            "', version:'" + @release.Version +
-            "', minDnn:'" + @release.MinDnn +
-            "', min2Sxc:'" + @release.Min2sxc +
-            "', minOqt:'" + @release.MinOqt +
-            "', guid:'" + @item.AppGuid + 
-          "'},";
+        AppendToJsonInstall(ref jsonToInstall, release, item, title);
+      }
+    }
+    if (jsonToInstall.Length > 0)
+      jsonToInstall = jsonToInstall.Substring(0, jsonToInstall.Length - 1);
+
+    jsonToInstall = "[" + jsonToInstall + "]";
+
+    return JsonConvert.DeserializeObject(jsonToInstall);
+  }
+
+  [HttpGet]
+  // For extensions catalog
+  public dynamic GetExtensions(
+    string ModuleId,
+    string SexyContentVersion,
+    string Platform,
+    string SysVersion,
+    string SxcVersion
+  ) {
+    var v2sxc = new Version(SxcVersion);
+
+    // To match the source-style, retrieve all extension items from a query
+    var allExtensions = AsList(App.Query["Extensions"]);
+
+    var title = "Available Extensions";
+    var jsonToInstall = "";
+    foreach (var item in allExtensions)
+    {
+      var release = AsList(item.Releases as object)
+        .Where(re => !string.IsNullOrEmpty(re.Min2sxc) && new Version(re.Min2sxc).CompareTo(v2sxc) < 1)
+        .OrderBy(x => x.Min2sxc != null)
+        .ThenByDescending(x => x.Min2sxc)
+        .ThenByDescending(x => x.Version)
+        .FirstOrDefault();
+
+      if (release != null)
+      {
+        AppendToJsonInstall(ref jsonToInstall, release, item, title);
       }
     }
 

@@ -5,9 +5,6 @@ import { Context } from "@2sic.com/sxc-angular";
 
 @Injectable({ providedIn: "root" })
 export class DataService {
-  edition = this.sxcContext.apiEdition || "local";
-  baseUrl = `/en/api/2sxc/app/App-Installer/${this.edition}/api/AppListData`;
-
   constructor(private http: HttpClient, private sxcContext: Context) {}
 
   // App-Installer (Templates / Autoinstall)
@@ -18,8 +15,9 @@ export class DataService {
     moduleId: string,
     query: string = "AutoInstaller"
   ): any {
+    const edition = this.sxcContext.apiEdition || "live";
     const url =
-      `${this.baseUrl}/GetListOfData` +
+      `/en/api/2sxc/app/App-Installer/${edition}/api/AppListData/GetListOfData` +
       `?QueryName=${query}` +
       `&ModuleId=${moduleId}` +
       `&SexyContentVersion=${sexyContentVersion}` +
@@ -31,20 +29,31 @@ export class DataService {
   }
 
   // ✅ Extensions → AutoQuery
-  getExtensions() {
-    const url = `/api/2sxc/app/auto/query/Extensions`;
-
-    return this.http.get<any>(url).pipe(
+  getExtensions(
+    sxcVersion: string,
+    sysversion: string,
+    sexyContentVersion: string,
+    moduleId: string
+  ) {
+    const edition = this.sxcContext.apiEdition || "live";
+    const url =
+      `/en/api/2sxc/app/App-Installer/${edition}/api/AppListData/GetExtensions` +
+      `?ModuleId=${moduleId}` +
+      `&SexyContentVersion=${sexyContentVersion}` +
+      `&platform=Dnn` +
+      `&sysversion=${sysversion}` +
+      `&sxcversion=${sxcVersion}`;
+    return this.http.get<any[]>(url).pipe(
       map((res) =>
-        (res?.Default ?? []).map((i) => ({
-          guid: i.AppGuid,
-          displayName: i.Title,
-          urlKey: i.UrlKey,
-          icon: i.Icon,
-          version: i.Releases?.[0]?.Title ?? "",
-          gitHub: i.Github,
-          gitHubRelease: i.Github,
-          downloadUrl: i.Github,
+        (res ?? []).map((i) => ({
+          guid: i.guid,
+          displayName: i.displayName,
+          urlKey: i.urlKey,
+          icon: i.icon,
+          version: i.version,
+          gitHub: i.gitHub,
+          gitHubRelease: i.gitHubRelease,
+          downloadUrl: i.downloadUrl,
           isSelected: false,
         }))
       ),
