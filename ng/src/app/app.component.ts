@@ -166,22 +166,27 @@ export class AppComponent extends SxcAppComponent {
   private setupFilteredAppsStream() {
     // Templates and Apps use App-Installer
     let queryType = "AutoInstaller"; // Default
+    
+    const sxcVersion = this.params.get("sxcversion");
+    const sysVersion = this.params.get("sysversion");
+    const sexyContentVersion = this.params.get("2SexyContentVersion");
 
     if (this.appViewMode === AppViewMode.Templates) {
       queryType = "TemplateList";
     } // Extensions have own API call
     else if (this.appViewMode === AppViewMode.Extensions) {
-      this.filteredApps$ = this.dataService.getExtensions().pipe(
+      this.filteredApps$ = this.dataService.getExtensions(
+        sxcVersion,
+        sysVersion,
+        sexyContentVersion,
+        this.moduleId,
+      ).pipe(
         combineLatestWith(this.sxcRules$),
-        map(([apps, rules]) => this.applyRulesToApps(apps, rules)),
+        map(([apps, rules]) => this.applyRulesToApps(apps as App[], rules)),
         shareReplay(1)
       );
       return;
     }
-
-    const sxcVersion = this.params.get("sxcversion");
-    const sysVersion = this.params.get("sysversion");
-    const sexyContentVersion = this.params.get("2SexyContentVersion");
 
     this.filteredApps$ = this.dataService
       .getApps(

@@ -1,13 +1,13 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { map, share } from "rxjs";
-import { environment } from "src/environments/environment";
-import { Context, SxcApp } from "@2sic.com/sxc-angular";
+import { Context } from "@2sic.com/sxc-angular";
 
-@Injectable({
-  providedIn: "root",
-})
+@Injectable({ providedIn: "root" })
 export class DataService {
+  edition = this.sxcContext.apiEdition || "local";
+  baseUrl = `/en/api/2sxc/app/App-Installer/${this.edition}/api/AppListData`;
+
   constructor(private http: HttpClient, private sxcContext: Context) {}
 
   // App-Installer (Templates / Autoinstall)
@@ -18,9 +18,8 @@ export class DataService {
     moduleId: string,
     query: string = "AutoInstaller"
   ): any {
-    const edition = this.sxcContext.apiEdition;
     const url =
-      `/en/api/2sxc/app/App-Installer/${edition}/api/AppListData/GetListOfData` +
+      `${this.baseUrl}/GetListOfData` +
       `?QueryName=${query}` +
       `&ModuleId=${moduleId}` +
       `&SexyContentVersion=${sexyContentVersion}` +
